@@ -27,69 +27,31 @@ FixFlow is built as a clean **Modular Monolith**:
 | **API Layer** | Apollo GraphQL | Type-safe, field-level operations via queries and mutations |
 | **Backend** | NestJS (Node.js & TypeScript) | Domain-driven modular architecture with guards and validation |
 | **Data Access** | Prisma ORM | Strictly typed PostgreSQL schema with full foreign keys |
-| **Database** | PostgreSQL 16 | Relational persistence with transactional integrity |
+| **Database** | PostgreSQL 16 / 18 | Relational persistence with transactional integrity |
 | **DevOps** | Docker, Docker Compose, Kubernetes | Containerization and deployment readiness |
 
 ---
 
-## 3. Monorepo Project Structure
+## 3. Quickstart & Local Setup
 
-```
-FixFlow/
-├── backend/                       # NestJS Application
-│   ├── prisma/
-│   │   ├── schema.prisma          # PostgreSQL Relational Schema & Enums
-│   │   └── seed.ts                # Database Seeder
-│   └── src/
-│       ├── common/                # Shared Guards, Decorators, SLA Engine
-│       ├── auth/                  # JWT Authentication & RBAC Guards
-│       ├── users/                 # User management & roles
-│       ├── locations/             # Campus buildings, floors, rooms
-│       ├── asset-categories/      # Asset classification
-│       ├── assets/                # Asset lifecycle, condition, status, QR ID
-│       ├── maintenance-requests/  # Request workflow & deterministic SLA engine
-│       ├── work-orders/           # Technician assignments & repair logs
-│       ├── preventive-maintenance/# Preventive recurring schedules
-│       ├── analytics/             # Operational KPIs & metrics
-│       ├── audit/                 # System audit logs
-│       ├── notifications/         # In-app notifications
-│       └── health/                # System health check query & controller
-├── frontend/                      # Next.js Application
-│   └── src/
-│       ├── app/                   # App Router pages (/login, /dashboard, /requests, /assets, ...)
-│       ├── components/            # Reusable UI components (Modals, Badges, Tables, Forms)
-│       └── lib/                   # Apollo Client, auth context, SLA calculations
-├── infrastructure/                # Docker & deployment manifests
-├── docs/                          # Architecture, database, API, setup guides
-├── docker-compose.yml             # Unified Docker compose
-├── .env.example                   # Master environment template
-└── package.json                   # Root monorepo workspace
-```
-
----
-
-## 4. Quickstart & Local Setup
-
-### Prerequisites
-- Node.js `v18+` or `v20+` / `v22+`
-- npm `v9+` or `v10+`
-- PostgreSQL instance (or Docker)
-
-### Installation
+### Step 1: Start Local PostgreSQL Database
+FixFlow bundles an embedded PostgreSQL engine for zero-config local evaluation:
 ```powershell
-# 1. Clone & install dependencies
-npm install
+npm run db:start
+```
+PostgreSQL will run on `postgresql://postgres:postgres@localhost:5432/fixflow_db`.
 
-# 2. Configure environment variables
-Copy-Item .env.example .env
-Copy-Item backend\.env.example backend\.env
-Copy-Item frontend\.env.example frontend\.env.local
+### Step 2: Push Database Schema & Seed Data
+In a second terminal:
+```powershell
+# Push Prisma schema to PostgreSQL
+npm run prisma:push --workspace=backend
 
-# 3. Generate Prisma client
-npm run db:generate
+# Seed users, locations, categories, and 15+ assets
+npm run db:seed
 ```
 
-### Running Backend (NestJS)
+### Step 3: Run Backend (NestJS)
 ```powershell
 npm run dev:backend
 # API running at: http://localhost:4000
@@ -97,48 +59,44 @@ npm run dev:backend
 # Health check: http://localhost:4000/api/health
 ```
 
-### Running Frontend (Next.js)
+### Step 4: Run Frontend (Next.js)
 ```powershell
 npm run dev:frontend
 # UI running at: http://localhost:3000
 ```
 
-### Running with Docker Compose
-```powershell
-docker compose up --build
-```
+---
+
+## 4. Demo Accounts & Credentials
+
+| Role | Email | Password | Pre-fill Available |
+|---|---|---|---|
+| **Facility Manager** | `manager@fixflow.edu` | `Manager@123` | Yes (`/login`) |
+| **Technician** | `tech.rahul@fixflow.edu` | `Tech@123` | Yes (`/login`) |
+| **Requester (Student)** | `student.riya@fixflow.edu` | `Student@123` | Yes (`/login`) |
+| **Administrator** | `admin@fixflow.edu` | `Admin@123` | Yes (`/login`) |
 
 ---
 
-## 5. GraphQL Verification
+## 5. Running Automated Tests
 
-Open `http://localhost:4000/graphql` in your browser and execute:
-
-```graphql
-query HealthCheck {
-  healthCheck {
-    status
-    service
-    environment
-    uptime
-    timestamp
-    database
-  }
-}
+Run backend unit and integration tests:
+```powershell
+cd backend
+npm test
 ```
+All 5 test suites (22 tests) cover authentication, JWT issuance, roles guard, asset CRUD validation, and location/category constraints.
 
 ---
 
 ## 6. Development Roadmap
 
 - [x] **Phase 1 — Foundation**: Monorepo scaffolding, NestJS backend, GraphQL health endpoint, Prisma schema with 12 entities, Next.js frontend with Apollo Client, and Docker manifests.
-- [ ] **Phase 2 — Authentication & RBAC**: JWT login, password hashing, roles guards, and session context.
-- [ ] **Phase 3 — Core Asset System**: Asset CRUD, locations, categories, lifecycle state machine.
-- [ ] **Phase 4 — Maintenance Requests & Work Orders**: SLA engine, ticket lifecycle, and technician assignments.
-- [ ] **Phase 5 — Preventive Maintenance**: Schedules, due/overdue calculation, and historical records.
-- [ ] **Phase 6 — Dashboards & Analytics**: Requester, Technician, Manager, and Admin dashboards.
-- [ ] **Phase 7 — Enhancements**: QR codes, in-app notifications, and audit logging.
-- [ ] **Phase 8 — DevOps**: GitHub Actions CI/CD, Kubernetes manifests, and monitoring.
+- [x] **Phase 2 — Core Backend, Auth & Asset Management**: PostgreSQL setup, Prisma migration & seeding, JWT authentication (`login`, `me`), RBAC (`@Roles(...)`, `RolesGuard`), User management, Campus Locations CRUD, Asset Categories CRUD, Campus Asset Registry with search & multi-filtering, audit logging, and automated Jest tests.
+- [ ] **Phase 3 — Maintenance Requests & Work Orders**: Strict state machine (OPEN -> TRIAGED -> ASSIGNED -> IN_PROGRESS -> RESOLVED -> VERIFIED -> CLOSED), SLA calculation engine, technician assignment, and repair execution.
+- [ ] **Phase 4 — Preventive Maintenance & History**: Maintenance schedules, upcoming/due/overdue status engine, and asset maintenance history records.
+- [ ] **Phase 5 — Role Dashboards & Analytics**: Requester, Technician, Facility Manager, and Admin dashboards with SLA compliance and failure analytics.
+- [ ] **Phase 6 — Enhancements & University Submission**: QR code routes (`/assets/[id]`), in-app notifications, Docker Compose verification, Kubernetes manifests, and academic documentation.
 
 ---
 

@@ -1,0 +1,35 @@
+{
+  "name": "fixflow-monorepo",
+  "version": "1.0.0",
+  "private": true,
+  "description": "FixFlow — Campus Maintenance & Asset Lifecycle Management Platform",
+  "workspaces": [
+    "backend",
+    "frontend"
+  ],
+  "scripts": {
+    "dev": "npm run dev:backend",
+    "start": "npm run start:dev --workspace=backend",
+    "dev:backend": "npm run start:dev --workspace=backend",
+    "dev:frontend": "npm run dev --workspace=frontend",
+    "build:backend": "npm run build --workspace=backend",
+    "build:frontend": "npm run build --workspace=frontend",
+    "build": "npm run build:backend && npm run build:frontend",
+    "db:start": "npm run db:start --workspace=backend",
+    "db:generate": "npm run prisma:generate --workspace=backend",
+    "db:migrate": "npm run prisma:migrate --workspace=backend",
+    "db:seed": "npm run prisma:seed --workspace=backend"
+  },
+  "keywords": [
+    "asset-management",
+    "maintenance",
+    "campus-facilities",
+    "nestjs",
+    "nextjs",
+    "graphql",
+    "prisma",
+    "postgresql"
+  ],
+  "author": "FixFlow Engineering Team",
+  "license": "UNLICENSED"
+}

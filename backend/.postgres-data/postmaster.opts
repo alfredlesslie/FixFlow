@@ -1,0 +1,1 @@
+C:/Users/LASSLIE/Documents/FixFlow/node_modules/@embedded-postgres/windows-x64/native/bin/postgres.exe "-D" "C:\Users\LASSLIE\Documents\FixFlow\backend\.postgres-data" "-p" "5432"

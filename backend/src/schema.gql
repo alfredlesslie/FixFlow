@@ -1,0 +1,373 @@
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
+
+"""Institutional campus asset specification and operational lifecycle"""
+type Asset {
+  """Unique institutional asset tag, e.g. AST-AC-ENG-101"""
+  assetTag: String!
+
+  """Classified equipment category"""
+  category: AssetCategory!
+  categoryId: String!
+
+  """Condition assessment rating from 1 (Critical/Failing) to 5 (Excellent)"""
+  conditionRating: Int!
+  createdAt: DateTime!
+
+  """Institutional criticality: LOW, MEDIUM, HIGH, CRITICAL"""
+  criticality: Criticality!
+
+  """Asset specifications and operational notes"""
+  description: String
+  id: ID!
+  installationDate: DateTime
+
+  """Physical campus housing location"""
+  location: Location!
+  locationId: String!
+  manufacturer: String
+  model: String
+
+  """Descriptive asset name"""
+  name: String!
+
+  """Stable unique public/internal QR code target URI"""
+  qrIdentifier: String!
+  serialNumber: String
+
+  """
+  Operational status: OPERATIONAL, UNDER_MAINTENANCE, OUT_OF_SERVICE, RETIRED
+  """
+  status: AssetStatus!
+  updatedAt: DateTime!
+  warrantyExpiry: DateTime
+}
+
+"""Asset category classification and maintenance intervals"""
+type AssetCategory {
+  """Unique category code"""
+  code: String!
+  createdAt: DateTime!
+
+  """Default frequency in days for preventive maintenance cycles"""
+  defaultMaintenanceIntervalDays: Int!
+
+  """Category scope description"""
+  description: String
+  id: ID!
+
+  """Category name, e.g. HVAC, Electrical"""
+  name: String!
+  updatedAt: DateTime!
+}
+
+"""Filter and search criteria for querying assets"""
+input AssetFilterInput {
+  """Filter by category ID"""
+  categoryId: ID
+
+  """Filter by criticality level"""
+  criticality: Criticality
+
+  """Filter by campus location ID"""
+  locationId: ID
+
+  """Fuzzy search across name, assetTag, manufacturer, and serialNumber"""
+  search: String
+
+  """Filter by operational status"""
+  status: AssetStatus
+}
+
+"""Operational lifecycle status of campus assets"""
+enum AssetStatus {
+  OPERATIONAL
+  OUT_OF_SERVICE
+  RETIRED
+  UNDER_MAINTENANCE
+}
+
+"""System audit and compliance log entry"""
+type AuditLog {
+  """Action performed, e.g. USER_LOGIN, ASSET_CREATED"""
+  action: String!
+
+  """ID of the user who performed the action"""
+  actorId: String
+
+  """Target entity type: USER, ASSET, LOCATION, etc."""
+  entity: String!
+
+  """Target entity identifier"""
+  entityId: String!
+  id: ID!
+
+  """Serialized metadata payload"""
+  metadata: String
+  timestamp: DateTime!
+}
+
+"""Authentication result containing JWT token and user profile"""
+type AuthPayload {
+  """Stateless JWT Bearer access token"""
+  accessToken: String!
+
+  """Authenticated user profile"""
+  user: User!
+}
+
+"""Payload for creating a new asset classification category"""
+input CreateAssetCategoryInput {
+  """Unique category identifier code, e.g. HVAC"""
+  code: String!
+
+  """Default preventive maintenance cycle in days"""
+  defaultMaintenanceIntervalDays: Int = 90
+  description: String
+
+  """Descriptive category name"""
+  name: String!
+}
+
+"""Payload for onboarding a new campus asset"""
+input CreateAssetInput {
+  """Unique asset identifier, e.g. AST-AC-ENG-101"""
+  assetTag: String!
+
+  """ID of the equipment category"""
+  categoryId: ID!
+
+  """Condition rating from 1 to 5"""
+  conditionRating: Int = 5
+
+  """Operational criticality level"""
+  criticality: Criticality = MEDIUM
+  description: String
+  installationDate: DateTime
+
+  """ID of the physical campus location"""
+  locationId: ID!
+  manufacturer: String
+  model: String
+
+  """Descriptive name of the equipment"""
+  name: String!
+
+  """Custom QR identifier (generated automatically if omitted)"""
+  qrIdentifier: String
+  serialNumber: String
+
+  """Initial operational status"""
+  status: AssetStatus = OPERATIONAL
+  warrantyExpiry: DateTime
+}
+
+"""Payload for registering a new campus location"""
+input CreateLocationInput {
+  """Campus building name"""
+  building: String!
+
+  """Unique location code, e.g. ENG-BLD-101"""
+  code: String!
+  description: String
+
+  """Floor level"""
+  floor: String!
+
+  """Human-readable location name"""
+  name: String!
+  roomNumber: String
+}
+
+"""Criticality level of campus equipment"""
+enum Criticality {
+  CRITICAL
+  HIGH
+  LOW
+  MEDIUM
+}
+
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
+
+"""FixFlow system health check response"""
+type HealthCheckPayload {
+  """Database connectivity status: connected | disconnected"""
+  database: String!
+
+  """Current environment"""
+  environment: String!
+
+  """Application service name"""
+  service: String!
+
+  """Overall system health status: ok | degraded"""
+  status: String!
+
+  """ISO timestamp of the health check"""
+  timestamp: String!
+
+  """Process uptime in seconds"""
+  uptime: Float!
+}
+
+"""Campus building, wing, or laboratory location"""
+type Location {
+  """Campus building name"""
+  building: String!
+
+  """Unique identifier code, e.g. ENG-BLD-101"""
+  code: String!
+  createdAt: DateTime!
+
+  """Additional location remarks"""
+  description: String
+
+  """Floor level"""
+  floor: String!
+  id: ID!
+
+  """Descriptive location name"""
+  name: String!
+
+  """Room or hall number"""
+  roomNumber: String
+  updatedAt: DateTime!
+}
+
+"""Institutional credentials for FixFlow sign-in"""
+input LoginInput {
+  """Institutional email address"""
+  email: String!
+
+  """User password"""
+  password: String!
+}
+
+type Mutation {
+  """Register a new institutional asset (Facility Manager or Admin only)"""
+  createAsset(input: CreateAssetInput!): Asset!
+
+  """Create a new asset category (Facility Manager or Admin only)"""
+  createAssetCategory(input: CreateAssetCategoryInput!): AssetCategory!
+
+  """Create a new campus location (Facility Manager or Admin only)"""
+  createLocation(input: CreateLocationInput!): Location!
+
+  """Authenticate an institutional user and issue a JWT Bearer token"""
+  login(input: LoginInput!): AuthPayload!
+
+  """
+  Update asset specifications or location (Facility Manager or Admin only)
+  """
+  updateAsset(id: ID!, input: UpdateAssetInput!): Asset!
+
+  """Update category details (Facility Manager or Admin only)"""
+  updateAssetCategory(id: ID!, input: UpdateAssetCategoryInput!): AssetCategory!
+
+  """Update the operational lifecycle status of an asset"""
+  updateAssetStatus(id: ID!, status: AssetStatus!): Asset!
+
+  """Update campus location details (Facility Manager or Admin only)"""
+  updateLocation(id: ID!, input: UpdateLocationInput!): Location!
+}
+
+type Query {
+  """Retrieve complete asset details by unique ID"""
+  asset(id: ID!): Asset!
+
+  """
+  Lookup an asset by its institutional asset tag (supports QR destination)
+  """
+  assetByTag(assetTag: String!): Asset!
+
+  """Retrieve all asset classification categories"""
+  assetCategories: [AssetCategory!]!
+
+  """Retrieve details of a single category by ID"""
+  assetCategory(id: ID!): AssetCategory!
+
+  """Retrieve campus assets with multi-criteria filtering and text search"""
+  assets(filter: AssetFilterInput): [Asset!]!
+
+  """Retrieve system security and operational audit logs (Admin only)"""
+  auditLogs(entity: String, limit: Int = 50): [AuditLog!]!
+
+  """System health check and database connectivity verification"""
+  healthCheck: HealthCheckPayload!
+
+  """Retrieve details of a specific campus location by ID"""
+  location(id: ID!): Location!
+
+  """Retrieve all campus facilities, buildings, and rooms"""
+  locations: [Location!]!
+
+  """Retrieve profile details of the currently authenticated user"""
+  me: User!
+
+  """Retrieve user details by ID"""
+  user(id: ID!): User!
+
+  """List institutional users (restricted to ADMIN and FACILITY_MANAGER)"""
+  users(role: Role): [User!]!
+}
+
+"""User access control roles in FixFlow"""
+enum Role {
+  ADMIN
+  FACILITY_MANAGER
+  REQUESTER
+  TECHNICIAN
+}
+
+"""Payload for updating an existing asset category"""
+input UpdateAssetCategoryInput {
+  defaultMaintenanceIntervalDays: Int
+  description: String
+  name: String
+}
+
+"""Payload for updating an existing campus asset"""
+input UpdateAssetInput {
+  categoryId: ID
+  conditionRating: Int
+  criticality: Criticality
+  description: String
+  installationDate: DateTime
+  locationId: ID
+  manufacturer: String
+  model: String
+  name: String
+  serialNumber: String
+  status: AssetStatus
+  warrantyExpiry: DateTime
+}
+
+"""Payload for updating an existing campus location"""
+input UpdateLocationInput {
+  building: String
+  description: String
+  floor: String
+  name: String
+  roomNumber: String
+}
+
+"""FixFlow institutional user profile"""
+type User {
+  createdAt: DateTime!
+  department: String
+  email: String!
+  firstName: String!
+  id: ID!
+  isActive: Boolean!
+  lastName: String!
+
+  """Full combined name"""
+  name: String!
+  phone: String
+  role: Role!
+  updatedAt: DateTime!
+}

@@ -1,0 +1,44 @@
+# Dependencies
+node_modules/
+/.pnp
+.pnp.js
+
+# Testing
+/coverage
+
+# Production
+/build
+/dist
+/.next/
+/out/
+
+# Misc
+.DS_Store
+*.pem
+Thumbs.db
+
+# Debug logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# Environment files
+.env
+.env*.local
+!.env.example
+!.env*.example
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Prisma
+/backend/prisma/*.db
+/backend/prisma/*.db-journal
+
+# Operating System
+ehthumbs.db
+[Dd]esktop.ini

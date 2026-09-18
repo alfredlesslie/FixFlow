@@ -1,0 +1,317 @@
+// FixFlow — Prisma Database Schema (PostgreSQL)
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+enum Role {
+  REQUESTER
+  TECHNICIAN
+  FACILITY_MANAGER
+  ADMIN
+}
+
+enum AssetStatus {
+  OPERATIONAL
+  UNDER_MAINTENANCE
+  OUT_OF_SERVICE
+  RETIRED
+}
+
+enum Criticality {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+enum Priority {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+enum RequestStatus {
+  OPEN
+  TRIAGED
+  ASSIGNED
+  IN_PROGRESS
+  RESOLVED
+  VERIFIED
+  CLOSED
+  REOPENED
+}
+
+enum WorkOrderStatus {
+  PENDING
+  ACCEPTED
+  IN_PROGRESS
+  ON_HOLD
+  COMPLETED
+  CANCELLED
+}
+
+enum ScheduleStatus {
+  UPCOMING
+  DUE
+  OVERDUE
+  COMPLETED
+}
+
+model User {
+  id           String   @id @default(uuid())
+  email        String   @unique
+  passwordHash String
+  firstName    String
+  lastName     String
+  role         Role     @default(REQUESTER)
+  department   String?
+  phone        String?
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  createdRequests    MaintenanceRequest[] @relation("UserCreatedRequests")
+  assignedWorkOrders WorkOrder[]          @relation("TechnicianWorkOrders")
+  maintenanceRecords MaintenanceRecord[]  @relation("TechnicianRecords")
+  auditLogs          AuditLog[]           @relation("UserAuditLogs")
+  comments           Comment[]            @relation("UserComments")
+  attachments        Attachment[]         @relation("UserAttachments")
+  notifications      Notification[]       @relation("UserNotifications")
+
+  @@index([role])
+  @@index([email])
+}
+
+model Location {
+  id          String   @id @default(uuid())
+  name        String
+  code        String   @unique
+  building    String
+  floor       String
+  roomNumber  String?
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  assets Asset[]
+
+  @@index([building])
+  @@index([code])
+}
+
+model AssetCategory {
+  id                            String   @id @default(uuid())
+  name                          String   @unique
+  code                          String   @unique
+  description                   String?
+  defaultMaintenanceIntervalDays Int      @default(90)
+  createdAt                     DateTime @default(now())
+  updatedAt                     DateTime @updatedAt
+
+  assets Asset[]
+}
+
+model Asset {
+  id              String      @id @default(uuid())
+  assetTag        String      @unique
+  name            String
+  description     String?
+  categoryId      String
+  locationId      String
+  status          AssetStatus @default(OPERATIONAL)
+  criticality     Criticality @default(MEDIUM)
+  conditionRating Int         @default(5) // 1 (Critical) to 5 (Excellent)
+  serialNumber    String?
+  manufacturer    String?
+  model           String?
+  installationDate DateTime?
+  warrantyExpiry  DateTime?
+  qrIdentifier    String      @unique
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+
+  category             AssetCategory         @relation(fields: [categoryId], references: [id])
+  location             Location              @relation(fields: [locationId], references: [id])
+  maintenanceRequests  MaintenanceRequest[]
+  workOrders           WorkOrder[]
+  maintenanceSchedules MaintenanceSchedule[]
+  maintenanceRecords   MaintenanceRecord[]
+
+  @@index([status])
+  @@index([criticality])
+  @@index([categoryId])
+  @@index([locationId])
+  @@index([assetTag])
+}
+
+model MaintenanceRequest {
+  id                String        @id @default(uuid())
+  requestNumber     String        @unique
+  title             String
+  description       String
+  requesterId       String
+  assetId           String
+  priority          Priority      @default(MEDIUM)
+  status            RequestStatus @default(OPEN)
+  slaTargetHours    Int           @default(24)
+  slaDeadline       DateTime
+  slaBreached       Boolean       @default(false)
+  rejectionReason   String?
+  verificationNotes String?
+  resolvedAt        DateTime?
+  closedAt          DateTime?
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
+
+  requester   User         @relation("UserCreatedRequests", fields: [requesterId], references: [id])
+  asset       Asset        @relation(fields: [assetId], references: [id])
+  workOrder   WorkOrder?
+  comments    Comment[]
+  attachments Attachment[]
+
+  @@index([status])
+  @@index([priority])
+  @@index([requesterId])
+  @@index([assetId])
+  @@index([slaDeadline])
+}
+
+model WorkOrder {
+  id                String          @id @default(uuid())
+  orderNumber       String          @unique
+  requestId         String          @unique
+  assetId           String
+  technicianId      String?
+  status            WorkOrderStatus @default(PENDING)
+  instructions      String?
+  workNotes         String?
+  resolutionSummary String?
+  partsUsed         String?
+  estimatedCost     Float?
+  actualCost        Float?
+  startedAt         DateTime?
+  completedAt       DateTime?
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
+
+  request     MaintenanceRequest  @relation(fields: [requestId], references: [id], onDelete: Cascade)
+  asset       Asset               @relation(fields: [assetId], references: [id])
+  technician  User?               @relation("TechnicianWorkOrders", fields: [technicianId], references: [id])
+  records     MaintenanceRecord[]
+  attachments Attachment[]
+
+  @@index([status])
+  @@index([technicianId])
+  @@index([assetId])
+}
+
+model MaintenanceSchedule {
+  id                String   @id @default(uuid())
+  title             String
+  description       String?
+  assetId           String
+  frequencyDays     Int
+  lastCompletedDate DateTime?
+  nextDueDate       DateTime
+  isEnabled         Boolean  @default(true)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  asset Asset @relation(fields: [assetId], references: [id], onDelete: Cascade)
+
+  @@index([assetId])
+  @@index([nextDueDate])
+  @@index([isEnabled])
+}
+
+model MaintenanceRecord {
+  id            String   @id @default(uuid())
+  assetId       String
+  workOrderId   String?
+  technicianId  String
+  actionTaken   String
+  repairDetails String?
+  partsReplaced String?
+  cost          Float?
+  dateCompleted DateTime @default(now())
+  createdAt     DateTime @default(now())
+
+  asset      Asset      @relation(fields: [assetId], references: [id])
+  workOrder  WorkOrder? @relation(fields: [workOrderId], references: [id])
+  technician User       @relation("TechnicianRecords", fields: [technicianId], references: [id])
+
+  @@index([assetId])
+  @@index([technicianId])
+  @@index([dateCompleted])
+}
+
+model Comment {
+  id         String   @id @default(uuid())
+  requestId  String
+  authorId   String
+  content    String
+  isInternal Boolean  @default(false)
+  createdAt  DateTime @default(now())
+
+  request MaintenanceRequest @relation(fields: [requestId], references: [id], onDelete: Cascade)
+  author  User               @relation("UserComments", fields: [authorId], references: [id])
+
+  @@index([requestId])
+}
+
+model Attachment {
+  id          String   @id @default(uuid())
+  requestId   String?
+  workOrderId String?
+  uploaderId  String
+  fileName    String
+  fileUrl     String
+  fileType    String
+  fileSize    Int
+  createdAt   DateTime @default(now())
+
+  request   MaintenanceRequest? @relation(fields: [requestId], references: [id], onDelete: Cascade)
+  workOrder WorkOrder?          @relation(fields: [workOrderId], references: [id], onDelete: Cascade)
+  uploader  User                @relation("UserAttachments", fields: [uploaderId], references: [id])
+
+  @@index([requestId])
+  @@index([workOrderId])
+}
+
+model AuditLog {
+  id        String   @id @default(uuid())
+  actorId   String?
+  action    String
+  entity    String
+  entityId  String
+  metadata  Json?
+  timestamp DateTime @default(now())
+
+  actor User? @relation("UserAuditLogs", fields: [actorId], references: [id])
+
+  @@index([entity, entityId])
+  @@index([actorId])
+  @@index([timestamp])
+}
+
+model Notification {
+  id        String   @id @default(uuid())
+  userId    String
+  title     String
+  message   String
+  type      String
+  isRead    Boolean  @default(false)
+  link      String?
+  createdAt DateTime @default(now())
+
+  user User @relation("UserNotifications", fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, isRead])
+}
