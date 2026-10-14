@@ -1,0 +1,192 @@
+- generic [active] [ref=f19e1]:
+  - generic [ref=f19e2]:
+    - banner [ref=f19e3]:
+      - generic [ref=f19e4]:
+        - link "FixFlow Campus Ops Lifecycle & Maintenance" [ref=f19e5] [cursor=pointer]:
+          - /url: /
+          - generic [ref=f19e11]:
+            - generic [ref=f19e12]:
+              - text: FixFlow
+              - generic [ref=f19e13]: Campus Ops
+            - generic [ref=f19e14]: Lifecycle & Maintenance
+        - navigation [ref=f19e15]:
+          - link "Challenges" [ref=f19e16] [cursor=pointer]:
+            - /url: "#problems"
+          - link "Solution" [ref=f19e17] [cursor=pointer]:
+            - /url: "#solution"
+          - link "Operations Roles" [ref=f19e18] [cursor=pointer]:
+            - /url: "#roles"
+          - link "Maintenance Lifecycle" [ref=f19e19] [cursor=pointer]:
+            - /url: "#lifecycle"
+        - link [ref=f19e21] [cursor=pointer]:
+          - /url: /login
+          - button "Sign In" [ref=f19e22]
+    - main [ref=f19e27]:
+      - generic [ref=f19e29]:
+        - generic [ref=f19e30]:
+          - generic [ref=f19e31]: Campus Infrastructure & Maintenance Intelligence
+          - heading "From Broken to Resolved, Visible Across Campus." [level=1] [ref=f19e34]
+          - paragraph [ref=f19e35]: A unified operational platform connecting students, field specialists, facility managers, and administrators. Eliminate duplicate reports, prioritize urgent repairs with live scoring, and inspect verified evidence before closure.
+          - generic [ref=f19e36]:
+            - link [ref=f19e37] [cursor=pointer]:
+              - /url: /login
+              - button "Access Station / Sign In" [ref=f19e38]
+            - link [ref=f19e43] [cursor=pointer]:
+              - /url: "#lifecycle"
+              - button "Explore Resolution Lifecycle" [ref=f19e44]
+        - generic [ref=f19e48]:
+          - generic [ref=f19e49]:
+            - generic [ref=f19e50]:
+              - generic [ref=f19e52]: LIVE TELEMETRY • REQ-2026-0103
+              - generic [ref=f19e53]: "Priority Score: 92/100"
+            - generic [ref=f19e54]:
+              - button "Triage Command" [ref=f19e55] [cursor=pointer]
+              - button "Field Evidence" [ref=f19e56] [cursor=pointer]
+              - button "Upvote Validation" [ref=f19e57] [cursor=pointer]
+          - generic [ref=f19e58]:
+            - generic [ref=f19e59]:
+              - generic [ref=f19e60]: "Turing Hall — Lecture Hall 402 • Asset: PRJ-T402"
+              - heading "Overheating ceiling projector with grinding fan noise" [level=3] [ref=f19e66]
+              - paragraph [ref=f19e67]: Laser projector shuts down with thermal overload indicator after 15 minutes of lecture projection. Community upvotes confirmed across 3 academic sections.
+              - generic [ref=f19e68]:
+                - generic [ref=f19e69]: 3 Duplicates Merged
+                - generic [ref=f19e72]: "SLA: 4h Resolution Window"
+            - generic [ref=f19e76]:
+              - generic [ref=f19e77]:
+                - generic [ref=f19e78]: Dispatch State
+                - generic [ref=f19e79]: Assigned
+              - generic [ref=f19e80]:
+                - generic [ref=f19e81]: Lead Specialist
+                - generic [ref=f19e82]: Rahul Sharma (HVAC/AV)
+              - generic [ref=f19e83]:
+                - generic [ref=f19e84]: Required Parts
+                - generic [ref=f19e85]: Exhaust Fan Unit (FAN-402)
+              - generic [ref=f19e86]:
+                - generic [ref=f19e87]: Verification Gate
+                - generic [ref=f19e88]: Photo Required
+      - generic [ref=f19e93]:
+        - generic [ref=f19e94]:
+          - text: Campus Maintenance Challenges
+          - heading "Why Campus Issue Resolution Breaks Down" [level=2] [ref=f19e95]
+          - paragraph [ref=f19e96]: Universities manage thousands of facilities, classrooms, and assets. Without a unified system, everyday operational friction compounds into multi-week delays.
+        - generic [ref=f19e97]:
+          - generic [ref=f19e100]:
+            - generic [ref=f19e101]: The Traditional Friction
+            - generic [ref=f19e105]:
+              - generic [ref=f19e106]:
+                - heading "Scattered & Lost Channels" [level=4] [ref=f19e107]
+                - paragraph [ref=f19e108]: Reports sent via random emails, front-desk sticky notes, or hallway mentions vanish with zero accountability or ticket tracking.
+              - generic [ref=f19e109]:
+                - heading "Duplicate Submission Avalanches" [level=4] [ref=f19e110]
+                - paragraph [ref=f19e111]: When an elevator or projector stalls, 20 different individuals file identical tickets, clogging administrative queues and wasting triage hours.
+              - generic [ref=f19e112]:
+                - heading "Subjective & Blind Prioritization" [level=4] [ref=f19e113]
+                - paragraph [ref=f19e114]: Urgent safety hazards often wait behind minor aesthetic requests simply because there is no automated scoring or impact analysis.
+              - generic [ref=f19e115]:
+                - heading "Zero Visibility & Ghost Closures" [level=4] [ref=f19e116]
+                - paragraph [ref=f19e117]: Tickets get marked "closed" without photographic evidence, leaving students and faculty wondering whether the item was ever inspected.
+          - generic [ref=f19e120]:
+            - generic [ref=f19e121]: The FixFlow Operating Standard
+            - generic [ref=f19e126]:
+              - generic [ref=f19e127]:
+                - heading "Centralized Campus Hub" [level=4] [ref=f19e128]
+                - paragraph [ref=f19e129]: A single authoritative platform tied directly to buildings, rooms, and registered equipment serial numbers.
+              - generic [ref=f19e130]:
+                - heading "Proactive Duplicate Deduplication & Upvotes" [level=4] [ref=f19e131]
+                - paragraph [ref=f19e132]: In-flight duplicate detection immediately alerts users to existing issues, turning redundant submissions into priority-boosting community votes.
+              - generic [ref=f19e133]:
+                - heading "Dynamic AI Priority Engine" [level=4] [ref=f19e134]
+                - paragraph [ref=f19e135]: Objective scoring (0–100) dynamically balances safety hazards, location occupancy, and vote counts to dispatch the right jobs first.
+              - generic [ref=f19e136]:
+                - heading "Mandatory Photographic Sign-Off" [level=4] [ref=f19e137]
+                - paragraph [ref=f19e138]: Field technicians must attach photographic evidence and parts usage logs before facility managers can grant final resolution approval.
+      - generic [ref=f19e140]:
+        - generic [ref=f19e141]:
+          - text: Institutional Personas
+          - heading "Four Dedicated Roles, One Unified Pipeline" [level=2] [ref=f19e142]
+          - paragraph [ref=f19e143]: Tailored operational environments engineered for every stakeholder across the campus maintenance lifecycle.
+        - generic [ref=f19e144]:
+          - button "Requester" [ref=f19e145] [cursor=pointer]
+          - button "Technician" [ref=f19e152] [cursor=pointer]
+          - button "Facility Manager" [ref=f19e156] [cursor=pointer]
+          - button "Administrator" [ref=f19e159] [cursor=pointer]
+        - generic [ref=f19e166]:
+          - generic [ref=f19e167]:
+            - generic [ref=f19e168]: Operations & Triage Command
+            - heading "Facility Manager Center — Triage, Dispatch & SLA Monitor" [level=3] [ref=f19e169]
+            - paragraph [ref=f19e170]: The operational heart of campus maintenance. Facility managers triage inbound reports with algorithmic urgency scoring, merge duplicates into single work orders, dispatch field specialists, and review repair photos in the Verification Studio before sign-off.
+            - generic [ref=f19e171]:
+              - generic [ref=f19e172]: AI-assisted priority scoring (0–100 scale)
+              - generic [ref=f19e176]: 1-click duplicate detection and issue merging
+              - generic [ref=f19e180]: Technician assignment with live workload visibility
+              - generic [ref=f19e184]: Verification Studio for final repair inspection
+          - generic [ref=f19e188]:
+            - generic [ref=f19e189]: Primary Responsibilities
+            - generic [ref=f19e190]:
+              - generic [ref=f19e191]:
+                - strong [ref=f19e192]: Triage & Queue Management
+                - text: Filter, prioritize, and dispatch tickets within SLA targets.
+              - generic [ref=f19e193]:
+                - strong [ref=f19e194]: Quality Assurance Sign-Off
+                - text: Validate technician photo evidence before closing tickets.
+      - generic [ref=f19e196]:
+        - generic [ref=f19e197]:
+          - text: End-to-End Workflow
+          - heading "The FixFlow Maintenance Lifecycle" [level=2] [ref=f19e198]
+          - paragraph [ref=f19e199]: A rigorous, four-phase sequence ensuring every campus defect is caught, deduplicated, fixed, and verified.
+        - generic [ref=f19e200]:
+          - generic [ref=f19e202]:
+            - generic [ref=f19e203]:
+              - generic [ref=f19e204]: "01"
+              - generic [ref=f19e205]: Phase 1
+              - heading "Capture & Deduplicate" [level=3] [ref=f19e206]
+              - paragraph [ref=f19e207]: Issue submitted with photo and location. Intelligent duplicate detection identifies similar reports, prompting requesters to upvote existing tickets instead of creating clutter.
+            - generic [ref=f19e208]: "Owner: Requester & Detection Engine"
+          - generic [ref=f19e210]:
+            - generic [ref=f19e211]:
+              - generic [ref=f19e212]: "02"
+              - generic [ref=f19e213]: Phase 2
+              - heading "Triage & Dynamic Priority" [level=3] [ref=f19e214]
+              - paragraph [ref=f19e215]: Automated scoring (0–100) evaluates safety risks, room occupancy, and community votes. Facility managers review the queue and dispatch work orders with active SLA timers.
+            - generic [ref=f19e216]: "Owner: Facility Manager & AI Scoring"
+          - generic [ref=f19e218]:
+            - generic [ref=f19e219]:
+              - generic [ref=f19e220]: "03"
+              - generic [ref=f19e221]: Phase 3
+              - heading "Field Repair & Parts" [level=3] [ref=f19e222]
+              - paragraph [ref=f19e223]: Assigned technician accepts the order on their workbench, accesses equipment manuals, logs replacement components, and carries out the physical maintenance.
+            - generic [ref=f19e224]: "Owner: Field Engineering Specialist"
+          - generic [ref=f19e226]:
+            - generic [ref=f19e227]:
+              - generic [ref=f19e228]: "04"
+              - generic [ref=f19e229]: Phase 4
+              - heading "Verified Proof & Sign-Off" [level=3] [ref=f19e230]
+              - paragraph [ref=f19e231]: Technician uploads photographic evidence of completed repair. Facility manager verifies proof in the Verification Studio before final closure and notifies all original upvoters.
+            - generic [ref=f19e232]: "Owner: Facility Manager & Requester"
+      - generic [ref=f19e236]:
+        - heading "Streamline Your Campus Infrastructure Today" [level=2] [ref=f19e242]
+        - paragraph [ref=f19e243]: Sign in with your institutional credentials to access your designated role portal, report maintenance issues, or manage campus work orders.
+        - link [ref=f19e244] [cursor=pointer]:
+          - /url: /login
+          - button "Sign In to Station" [ref=f19e245]
+    - contentinfo [ref=f19e250]:
+      - generic [ref=f19e251]:
+        - generic [ref=f19e258]:
+          - text: FixFlow
+          - paragraph [ref=f19e259]: Campus Operations & Maintenance Intelligence Platform
+        - generic [ref=f19e260]:
+          - link "Challenges" [ref=f19e261] [cursor=pointer]:
+            - /url: "#problems"
+          - link "Solution" [ref=f19e262] [cursor=pointer]:
+            - /url: "#solution"
+          - link "Roles" [ref=f19e263] [cursor=pointer]:
+            - /url: "#roles"
+          - link "Lifecycle" [ref=f19e264] [cursor=pointer]:
+            - /url: "#lifecycle"
+          - link "Sign In" [ref=f19e265] [cursor=pointer]:
+            - /url: /login
+        - generic [ref=f19e266]:
+          - generic [ref=f19e267]: "SLA Target: 95%"
+          - generic [ref=f19e270]: •
+          - generic [ref=f19e271]: RBAC Protected
+  - alert [ref=f19e272]

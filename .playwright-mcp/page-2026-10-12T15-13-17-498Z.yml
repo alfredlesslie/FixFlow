@@ -1,0 +1,92 @@
+- generic [active] [ref=f16e1]:
+  - alert [ref=f16e272]
+  - generic [ref=f16e365]:
+    - banner [ref=f16e366]:
+      - generic [ref=f16e367]:
+        - generic [ref=f16e368]:
+          - link "FixFlow Campus Ops Lifecycle & Maintenance" [ref=f16e369] [cursor=pointer]:
+            - /url: /
+            - generic [ref=f16e375]:
+              - generic [ref=f16e376]:
+                - text: FixFlow
+                - generic [ref=f16e377]: Campus Ops
+              - generic [ref=f16e378]: Lifecycle & Maintenance
+          - navigation [ref=f16e379]:
+            - link "Dashboard" [ref=f16e380] [cursor=pointer]:
+              - /url: /
+            - link "Assets & Locations" [ref=f16e381] [cursor=pointer]:
+              - /url: /assets
+        - generic [ref=f16e387]:
+          - button "View notifications" [ref=f16e389] [cursor=pointer]
+          - button "Sunil Mehta Sunil" [ref=f16e394] [cursor=pointer]:
+            - img "Sunil Mehta" [ref=f16e395]
+            - generic [ref=f16e396]: Sunil
+    - main [ref=f16e399]:
+      - generic [ref=f16e400]:
+        - generic [ref=f16e401]:
+          - generic [ref=f16e402]:
+            - text: Facility Manager Command Center
+            - heading "Operations & Triage Command" [level=1] [ref=f16e403]
+            - paragraph [ref=f16e404]:
+              - text: "Director of Operations:"
+              - strong [ref=f16e405]: Sunil Mehta
+              - text: • Active Triage Engine & SLA Monitor
+          - generic [ref=f16e406]:
+            - generic [ref=f16e407]:
+              - generic [ref=f16e408]: 94.6%
+              - generic [ref=f16e409]: SLA Met
+            - generic [ref=f16e410]:
+              - generic [ref=f16e411]: 3.8h
+              - generic [ref=f16e412]: Mean MTTR
+        - generic [ref=f16e413]:
+          - generic [ref=f16e414] [cursor=pointer]:
+            - generic [ref=f16e415]: Triage Queue
+            - generic [ref=f16e418]:
+              - generic [ref=f16e419]: "1"
+              - generic [ref=f16e420]: Needs Dispatch
+          - generic [ref=f16e421] [cursor=pointer]:
+            - generic [ref=f16e422]: Repairs for Review
+            - generic [ref=f16e428]:
+              - generic [ref=f16e429]: "1"
+              - generic [ref=f16e430]: Pending Sign-off
+          - generic [ref=f16e431] [cursor=pointer]:
+            - generic [ref=f16e432]: Active Work Orders
+            - generic [ref=f16e439]:
+              - generic [ref=f16e440]: "2"
+              - generic [ref=f16e441]: Field Operations
+          - generic [ref=f16e442]:
+            - generic [ref=f16e443]: Critical / High Severity
+            - generic [ref=f16e447]:
+              - generic [ref=f16e448]: "3"
+              - generic [ref=f16e449]: Priority 1 & 2
+        - generic [ref=f16e450]:
+          - button "Triage & Dispatch Queue (1)" [ref=f16e451] [cursor=pointer]
+          - button "Verification Studio" [ref=f16e452] [cursor=pointer]
+          - button "All Work Orders (3)" [ref=f16e455] [cursor=pointer]
+        - generic [ref=f16e457]:
+          - generic [ref=f16e458]:
+            - generic [ref=f16e459]:
+              - generic [ref=f16e460]: REQ-2026-0103
+              - generic [ref=f16e461]: Triaged
+              - generic [ref=f16e464]: Medium
+              - generic [ref=f16e465]: "Score: 58/100"
+            - heading "Overheating ceiling projector with grinding fan noise" [level=3] [ref=f16e466] [cursor=pointer]
+            - generic [ref=f16e467]:
+              - generic [ref=f16e468]: Turing Hall — Lecture Hall 402
+              - generic [ref=f16e472]: •
+              - generic [ref=f16e473]: "Reported by: Alex Rivera"
+              - generic [ref=f16e474]: •
+              - generic [ref=f16e475]: 6 Community Votes
+            - paragraph [ref=f16e476]: Lecture Hall 402 laser projector shuts down with thermal overload indicator after 15 minutes of lecture projection. Loud audible grinding bearing noise coming from exhaust fan.
+          - generic [ref=f16e477]:
+            - button "Dispatch Work Order" [ref=f16e478] [cursor=pointer]
+            - generic [ref=f16e486]:
+              - button "Override Score" [ref=f16e487] [cursor=pointer]
+              - button "Merge Duplicates" [ref=f16e491] [cursor=pointer]
+    - contentinfo [ref=f16e498]:
+      - generic [ref=f16e499]:
+        - generic [ref=f16e500]: FixFlow Operations v1.0 • Built with Next.js, Apollo GraphQL & PostgreSQL
+        - generic [ref=f16e501]:
+          - generic [ref=f16e502]: "SLA Target: 95%"
+          - generic [ref=f16e503]: •
+          - generic [ref=f16e504]: Real-time Event Bridge Active

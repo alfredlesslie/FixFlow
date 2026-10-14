@@ -1,4 +1,4 @@
-// File: C:\Users\LASSLIE\Documents\FixFlow\frontend\src\app\page.tsx
+// File: C:\projects\FixFlow\frontend\src\app\page.tsx
 import * as entry from '../../../src/app/page.js'
 import type { ResolvingMetadata, ResolvingViewport } from 'next/dist/lib/metadata/types/metadata-interface.js'
 

@@ -1,0 +1,53 @@
+- generic [active] [ref=f11e1]:
+  - alert [ref=f11e66]
+  - generic [ref=f11e67]:
+    - banner [ref=f11e68]:
+      - generic [ref=f11e69]:
+        - generic [ref=f11e70]:
+          - link "FixFlow Campus Ops Lifecycle & Maintenance" [ref=f11e71] [cursor=pointer]:
+            - /url: /
+            - generic [ref=f11e77]:
+              - generic [ref=f11e78]:
+                - text: FixFlow
+                - generic [ref=f11e79]: Campus Ops
+              - generic [ref=f11e80]: Lifecycle & Maintenance
+          - navigation [ref=f11e81]:
+            - link "Dashboard" [ref=f11e82] [cursor=pointer]:
+              - /url: /
+            - link "Assets & Locations" [ref=f11e83] [cursor=pointer]:
+              - /url: /assets
+        - generic [ref=f11e89]:
+          - button "View notifications" [ref=f11e91] [cursor=pointer]
+          - button "Rahul Verma Rahul" [ref=f11e96] [cursor=pointer]:
+            - img "Rahul Verma" [ref=f11e97]
+            - generic [ref=f11e98]: Rahul
+    - main [ref=f11e101]:
+      - generic [ref=f11e102]:
+        - generic [ref=f11e103]:
+          - generic [ref=f11e104]:
+            - text: Technician Workbench
+            - heading "Field Dispatch & Repair Orders" [level=1] [ref=f11e105]
+            - paragraph [ref=f11e106]:
+              - text: "Assigned to:"
+              - strong [ref=f11e107]: Rahul Verma
+              - text: • Electrical & Automation Systems
+          - generic [ref=f11e108]:
+            - generic [ref=f11e109]:
+              - generic [ref=f11e110]: "0"
+              - text: Active Jobs
+            - generic [ref=f11e111]:
+              - generic [ref=f11e112]: "0"
+              - text: Completed
+        - generic [ref=f11e113]:
+          - button "All Assigned (0)" [ref=f11e114] [cursor=pointer]
+          - button "In Progress (0)" [ref=f11e115] [cursor=pointer]
+          - button "Pending / Accepted (0)" [ref=f11e116] [cursor=pointer]
+          - button "Awaiting Verification (0)" [ref=f11e117] [cursor=pointer]
+        - generic [ref=f11e118]: No work orders in this view.
+    - contentinfo [ref=f11e120]:
+      - generic [ref=f11e121]:
+        - generic [ref=f11e122]: FixFlow Operations v1.0 • Built with Next.js, Apollo GraphQL & PostgreSQL
+        - generic [ref=f11e123]:
+          - generic [ref=f11e124]: "SLA Target: 95%"
+          - generic [ref=f11e125]: •
+          - generic [ref=f11e126]: Real-time Event Bridge Active

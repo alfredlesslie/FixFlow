@@ -1,0 +1,175 @@
+- generic [active] [ref=f12e1]:
+  - alert [ref=f12e66]
+  - generic [ref=f12e67]:
+    - banner [ref=f12e68]:
+      - generic [ref=f12e69]:
+        - generic [ref=f12e70]:
+          - link "FixFlow Campus Ops Lifecycle & Maintenance" [ref=f12e71] [cursor=pointer]:
+            - /url: /
+            - generic [ref=f12e77]:
+              - generic [ref=f12e78]:
+                - text: FixFlow
+                - generic [ref=f12e79]: Campus Ops
+              - generic [ref=f12e80]: Lifecycle & Maintenance
+          - navigation [ref=f12e81]:
+            - link "Dashboard" [ref=f12e82] [cursor=pointer]:
+              - /url: /
+            - link "Assets & Locations" [ref=f12e83] [cursor=pointer]:
+              - /url: /assets
+        - generic [ref=f12e89]:
+          - button "View notifications" [ref=f12e91] [cursor=pointer]
+          - button "Vikram Singhania Vikram" [ref=f12e96] [cursor=pointer]:
+            - img "Vikram Singhania" [ref=f12e97]
+            - generic [ref=f12e98]: Vikram
+    - main [ref=f12e101]:
+      - generic [ref=f12e102]:
+        - generic [ref=f12e103]:
+          - generic [ref=f12e104]:
+            - text: System Administration
+            - heading "Governance, Security & Audit Console" [level=1] [ref=f12e105]
+            - paragraph [ref=f12e106]:
+              - text: "Signed in as System Administrator:"
+              - strong [ref=f12e107]: Vikram Singhania
+              - text: • Immutable Audit Trail Active
+          - generic [ref=f12e108]: "PostgreSQL: Healthy"
+        - generic [ref=f12e114]:
+          - button "User & Role Governance (7)" [ref=f12e115] [cursor=pointer]
+          - button "Security & Audit Explorer (3)" [ref=f12e122] [cursor=pointer]
+          - button "Health & Diagnostics" [ref=f12e127] [cursor=pointer]
+        - generic [ref=f12e131]:
+          - generic [ref=f12e132]: Administrators can dynamically assign roles and revoke access. Changes immediately update permissions and create an immutable audit record.
+          - table [ref=f12e135]:
+            - rowgroup [ref=f12e136]:
+              - row [ref=f12e137]:
+                - columnheader "User" [ref=f12e138]
+                - columnheader "Department" [ref=f12e139]
+                - columnheader "Current Role" [ref=f12e140]
+                - columnheader "Account Status" [ref=f12e141]
+                - columnheader "Actions" [ref=f12e142]
+            - rowgroup [ref=f12e143]:
+              - row [ref=f12e144]:
+                - cell "Sarah Jenkins Sarah Jenkins admin@campus.edu" [ref=f12e145]:
+                  - generic [ref=f12e146]:
+                    - img "Sarah Jenkins" [ref=f12e147]
+                    - generic [ref=f12e148]:
+                      - generic [ref=f12e149]: Sarah Jenkins
+                      - text: admin@campus.edu
+                - cell "Campus Administration" [ref=f12e150]
+                - cell "ADMIN" [ref=f12e151]:
+                  - combobox [ref=f12e152]:
+                    - option "REQUESTER"
+                    - option "TECHNICIAN"
+                    - option "FACILITY_MANAGER"
+                    - option "ADMIN" [selected]
+                - cell "Active" [ref=f12e153]
+                - cell [ref=f12e156]:
+                  - button "Suspend" [ref=f12e157] [cursor=pointer]
+              - row [ref=f12e163]:
+                - cell "Robert Sterling Robert Sterling manager@campus.edu" [ref=f12e164]:
+                  - generic [ref=f12e165]:
+                    - img "Robert Sterling" [ref=f12e166]
+                    - generic [ref=f12e167]:
+                      - generic [ref=f12e168]: Robert Sterling
+                      - text: manager@campus.edu
+                - cell "Facilities & Campus Operations" [ref=f12e169]
+                - cell "FACILITY_MANAGER" [ref=f12e170]:
+                  - combobox [ref=f12e171]:
+                    - option "REQUESTER"
+                    - option "TECHNICIAN"
+                    - option "FACILITY_MANAGER" [selected]
+                    - option "ADMIN"
+                - cell "Active" [ref=f12e172]
+                - cell [ref=f12e175]:
+                  - button "Suspend" [ref=f12e176] [cursor=pointer]
+              - row [ref=f12e182]:
+                - cell "Marcus Vance Marcus Vance tech1@campus.edu" [ref=f12e183]:
+                  - generic [ref=f12e184]:
+                    - img "Marcus Vance" [ref=f12e185]
+                    - generic [ref=f12e186]:
+                      - generic [ref=f12e187]: Marcus Vance
+                      - text: tech1@campus.edu
+                - cell "HVAC & Electrical Maintenance" [ref=f12e188]
+                - cell "TECHNICIAN" [ref=f12e189]:
+                  - combobox [ref=f12e190]:
+                    - option "REQUESTER"
+                    - option "TECHNICIAN" [selected]
+                    - option "FACILITY_MANAGER"
+                    - option "ADMIN"
+                - cell "Active" [ref=f12e191]
+                - cell [ref=f12e194]:
+                  - button "Suspend" [ref=f12e195] [cursor=pointer]
+              - row [ref=f12e201]:
+                - cell "Elena Rostova Elena Rostova tech2@campus.edu" [ref=f12e202]:
+                  - generic [ref=f12e203]:
+                    - img "Elena Rostova" [ref=f12e204]
+                    - generic [ref=f12e205]:
+                      - generic [ref=f12e206]: Elena Rostova
+                      - text: tech2@campus.edu
+                - cell "Plumbing & Structural Systems" [ref=f12e207]
+                - cell "TECHNICIAN" [ref=f12e208]:
+                  - combobox [ref=f12e209]:
+                    - option "REQUESTER"
+                    - option "TECHNICIAN" [selected]
+                    - option "FACILITY_MANAGER"
+                    - option "ADMIN"
+                - cell "Active" [ref=f12e210]
+                - cell [ref=f12e213]:
+                  - button "Suspend" [ref=f12e214] [cursor=pointer]
+              - row [ref=f12e220]:
+                - cell "David Kim David Kim tech3@campus.edu" [ref=f12e221]:
+                  - generic [ref=f12e222]:
+                    - img "David Kim" [ref=f12e223]
+                    - generic [ref=f12e224]:
+                      - generic [ref=f12e225]: David Kim
+                      - text: tech3@campus.edu
+                - cell "Audio-Visual & Electronics" [ref=f12e226]
+                - cell "TECHNICIAN" [ref=f12e227]:
+                  - combobox [ref=f12e228]:
+                    - option "REQUESTER"
+                    - option "TECHNICIAN" [selected]
+                    - option "FACILITY_MANAGER"
+                    - option "ADMIN"
+                - cell "Active" [ref=f12e229]
+                - cell [ref=f12e232]:
+                  - button "Suspend" [ref=f12e233] [cursor=pointer]
+              - row [ref=f12e239]:
+                - cell "Alex Rivera Alex Rivera student1@campus.edu" [ref=f12e240]:
+                  - generic [ref=f12e241]:
+                    - img "Alex Rivera" [ref=f12e242]
+                    - generic [ref=f12e243]:
+                      - generic [ref=f12e244]: Alex Rivera
+                      - text: student1@campus.edu
+                - cell "Computer Science (Undergrad)" [ref=f12e245]
+                - cell "REQUESTER" [ref=f12e246]:
+                  - combobox [ref=f12e247]:
+                    - option "REQUESTER" [selected]
+                    - option "TECHNICIAN"
+                    - option "FACILITY_MANAGER"
+                    - option "ADMIN"
+                - cell "Active" [ref=f12e248]
+                - cell [ref=f12e251]:
+                  - button "Suspend" [ref=f12e252] [cursor=pointer]
+              - row [ref=f12e258]:
+                - cell "Prof. Clara Higgins Prof. Clara Higgins staff1@campus.edu" [ref=f12e259]:
+                  - generic [ref=f12e260]:
+                    - img "Prof. Clara Higgins" [ref=f12e261]
+                    - generic [ref=f12e262]:
+                      - generic [ref=f12e263]: Prof. Clara Higgins
+                      - text: staff1@campus.edu
+                - cell "Department of Physics & Astronomy" [ref=f12e264]
+                - cell "REQUESTER" [ref=f12e265]:
+                  - combobox [ref=f12e266]:
+                    - option "REQUESTER" [selected]
+                    - option "TECHNICIAN"
+                    - option "FACILITY_MANAGER"
+                    - option "ADMIN"
+                - cell "Active" [ref=f12e267]
+                - cell [ref=f12e270]:
+                  - button "Suspend" [ref=f12e271] [cursor=pointer]
+    - contentinfo [ref=f12e277]:
+      - generic [ref=f12e278]:
+        - generic [ref=f12e279]: FixFlow Operations v1.0 • Built with Next.js, Apollo GraphQL & PostgreSQL
+        - generic [ref=f12e280]:
+          - generic [ref=f12e281]: "SLA Target: 95%"
+          - generic [ref=f12e282]: •
+          - generic [ref=f12e283]: Real-time Event Bridge Active

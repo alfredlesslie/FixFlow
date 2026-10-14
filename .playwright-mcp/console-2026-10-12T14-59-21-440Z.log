@@ -1,0 +1,30 @@
+[      78ms] [VERBOSE] [DOM] Input elements should have autocomplete attributes (suggested: "current-password"): (More info: https://goo.gl/9p2vKq) @ http://localhost:3000/login:0
+[   10099ms] [LOG] Download the Apollo DevTools for a better development experience: %s https://chrome.google.com/webstore/detail/apollo-client-developer-t/jdkknkkbebbapilgoeccciglkfbmbnfm @ http://localhost:3000/_next/static/chunks/836-86c35fb61f836703.js:12
+[   26149ms] [VERBOSE] [DOM] Input elements should have autocomplete attributes (suggested: "current-password"): (More info: https://goo.gl/9p2vKq) @ http://localhost:3000/login:0
+[   36179ms] [LOG] Download the Apollo DevTools for a better development experience: %s https://chrome.google.com/webstore/detail/apollo-client-developer-t/jdkknkkbebbapilgoeccciglkfbmbnfm @ http://localhost:3000/_next/static/chunks/836-86c35fb61f836703.js:12
+[   48495ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://localhost:4000/graphql:0
+[   48496ms] [WARNING] Backend GraphQL unreachable or rejected. Checking institutional seed accounts... ApolloError: Failed to fetch
+    at new t (http://localhost:3000/_next/static/chunks/836-86c35fb61f836703.js:13:36045)
+    at Object.error (http://localhost:3000/_next/static/chunks/917-c21a0de6c2e2e32d.js:1:54015)
+    at b (http://localhost:3000/_next/static/chunks/836-86c35fb61f836703.js:13:87760)
+    at g (http://localhost:3000/_next/static/chunks/836-86c35fb61f836703.js:13:88261)
+    at t.error (http://localhost:3000/_next/static/chunks/836-86c35fb61f836703.js:13:88814)
+    at Object.error (http://localhost:3000/_next/static/chunks/917-c21a0de6c2e2e32d.js:1:43534)
+    at b (http://localhost:3000/_next/static/chunks/836-86c35fb61f836703.js:13:87760)
+    at g (http://localhost:3000/_next/static/chunks/836-86c35fb61f836703.js:13:88261)
+    at t.error (http://localhost:3000/_next/static/chunks/836-86c35fb61f836703.js:13:88814)
+    at http://localhost:3000/_next/static/chunks/836-86c35fb61f836703.js:13:63290 @ http://localhost:3000/_next/static/chunks/app/layout-78ab6dcba3fd913f.js:0
+[   63517ms] [VERBOSE] [DOM] Input elements should have autocomplete attributes (suggested: "current-password"): (More info: https://goo.gl/9p2vKq) @ http://localhost:3000/login:0
+[   73575ms] [LOG] Download the Apollo DevTools for a better development experience: %s https://chrome.google.com/webstore/detail/apollo-client-developer-t/jdkknkkbebbapilgoeccciglkfbmbnfm @ http://localhost:3000/_next/static/chunks/836-86c35fb61f836703.js:12
+[   79174ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://localhost:4000/graphql:0
+[   79175ms] [WARNING] Backend GraphQL unreachable or rejected. Checking institutional seed accounts... ApolloError: Failed to fetch
+    at new t (http://localhost:3000/_next/static/chunks/836-86c35fb61f836703.js:13:36045)
+    at Object.error (http://localhost:3000/_next/static/chunks/917-c21a0de6c2e2e32d.js:1:54015)
+    at b (http://localhost:3000/_next/static/chunks/836-86c35fb61f836703.js:13:87760)
+    at g (http://localhost:3000/_next/static/chunks/836-86c35fb61f836703.js:13:88261)
+    at t.error (http://localhost:3000/_next/static/chunks/836-86c35fb61f836703.js:13:88814)
+    at Object.error (http://localhost:3000/_next/static/chunks/917-c21a0de6c2e2e32d.js:1:43534)
+    at b (http://localhost:3000/_next/static/chunks/836-86c35fb61f836703.js:13:87760)
+    at g (http://localhost:3000/_next/static/chunks/836-86c35fb61f836703.js:13:88261)
+    at t.error (http://localhost:3000/_next/static/chunks/836-86c35fb61f836703.js:13:88814)
+    at http://localhost:3000/_next/static/chunks/836-86c35fb61f836703.js:13:63290 @ http://localhost:3000/_next/static/chunks/app/layout-78ab6dcba3fd913f.js:0

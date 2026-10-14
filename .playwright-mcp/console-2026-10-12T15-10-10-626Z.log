@@ -1,0 +1,2 @@
+[     199ms] [VERBOSE] [DOM] Input elements should have autocomplete attributes (suggested: "current-password"): (More info: https://goo.gl/9p2vKq) @ http://localhost:3000/login:0
+[   10071ms] [LOG] Download the Apollo DevTools for a better development experience: %s https://chrome.google.com/webstore/detail/apollo-client-developer-t/jdkknkkbebbapilgoeccciglkfbmbnfm @ http://localhost:3000/_next/static/chunks/836-86c35fb61f836703.js:12

@@ -4,12 +4,112 @@
 
 :root {
   --background: #f8fafc;
-  --foreground: #0f172a;
+  --foreground: #090d16;
+  --surface: #ffffff;
+  --surface-raised: #f1f5f9;
+  --border-subtle: rgba(15, 23, 42, 0.08);
+  --border-strong: rgba(15, 23, 42, 0.16);
+  --accent-brand: #0284c7;
+  --accent-warning: #f59e0b;
+  --accent-critical: #ef4444;
+  --accent-success: #10b981;
+
+  /* Emil Kowalski custom snappy curves */
+  --ease-snappy: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-spring: cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+.dark {
+  --background: #06090e;
+  --foreground: #f1f5f9;
+  --surface: #0b111a;
+  --surface-raised: #121a26;
+  --border-subtle: rgba(255, 255, 255, 0.08);
+  --border-strong: rgba(255, 255, 255, 0.16);
+  --accent-brand: #38bdf8;
+  --accent-warning: #fbbf24;
+  --accent-critical: #f87171;
+  --accent-success: #34d399;
 }
 
 body {
   color: var(--foreground);
   background: var(--background);
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-  min-height: 100vh;
+  font-family: var(--font-sans), -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  min-height: 100dvh;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Double-bezel hardware shell architecture */
+.double-bezel {
+  box-shadow: 
+    0 0 0 1px var(--border-subtle),
+    0 1px 2px 0 rgba(0, 0, 0, 0.05),
+    0 4px 12px 0 rgba(0, 0, 0, 0.03);
+}
+
+.double-bezel-interactive {
+  box-shadow: 
+    0 0 0 1px var(--border-subtle),
+    0 1px 2px 0 rgba(0, 0, 0, 0.04);
+  transition: all 160ms var(--ease-snappy);
+}
+
+.double-bezel-interactive:hover {
+  box-shadow: 
+    0 0 0 1px var(--border-strong),
+    0 4px 14px 0 rgba(0, 0, 0, 0.08);
+  transform: translateY(-1px);
+}
+
+/* Haptic active tactile press */
+.haptic-press {
+  transition: transform 120ms var(--ease-snappy), filter 120ms ease;
+}
+
+.haptic-press:active {
+  transform: scale(0.975);
+}
+
+/* Tabular figures for timers, IDs, and metrics */
+.tabular-data {
+  font-family: var(--font-mono), ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Custom discreet scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(148, 163, 184, 0.3);
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(148, 163, 184, 0.5);
+}
+
+/* Ambient glow accents */
+.glow-emerald {
+  box-shadow: 0 0 20px -3px rgba(16, 185, 129, 0.25);
+}
+
+.glow-amber {
+  box-shadow: 0 0 20px -3px rgba(245, 158, 11, 0.25);
+}
+
+.glow-rose {
+  box-shadow: 0 0 20px -3px rgba(239, 68, 68, 0.25);
+}
+
+.glow-sky {
+  box-shadow: 0 0 20px -3px rgba(2, 132, 199, 0.25);
 }

@@ -1,0 +1,20 @@
+- generic [active] [ref=f7e1]:
+  - generic [ref=f7e3]:
+    - generic [ref=f7e7]:
+      - text: 403 • Access Restricted
+      - heading "Unauthorized Station Access" [level=2] [ref=f7e8]
+      - paragraph [ref=f7e9]:
+        - text: Your active institutional role
+        - strong [ref=f7e10]: "[FACILITY_MANAGER]"
+        - text: does not have permission to access this operational dashboard.
+    - generic [ref=f7e11]:
+      - generic [ref=f7e12]:
+        - generic [ref=f7e13]: "Authorized Roles:"
+        - generic [ref=f7e14]: ADMIN
+      - generic [ref=f7e15]:
+        - generic [ref=f7e16]: "Active Account:"
+        - generic [ref=f7e17]: manager@fixflow.edu
+    - generic [ref=f7e18]:
+      - button "Return to My Station" [ref=f7e19] [cursor=pointer]
+      - button "Sign Out" [ref=f7e24] [cursor=pointer]
+  - alert [ref=f7e30]

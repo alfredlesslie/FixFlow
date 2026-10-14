@@ -1,0 +1,104 @@
+- generic [ref=f7e1]:
+  - alert [ref=f7e30]
+  - generic [ref=f7e31]:
+    - banner [ref=f7e32]:
+      - generic [ref=f7e33]:
+        - generic [ref=f7e34]:
+          - link "FixFlow Campus Ops Lifecycle & Maintenance" [ref=f7e35] [cursor=pointer]:
+            - /url: /
+            - generic [ref=f7e41]:
+              - generic [ref=f7e42]:
+                - text: FixFlow
+                - generic [ref=f7e43]: Campus Ops
+              - generic [ref=f7e44]: Lifecycle & Maintenance
+          - navigation [ref=f7e45]:
+            - link "Dashboard" [ref=f7e46] [cursor=pointer]:
+              - /url: /
+            - link "Assets & Locations" [ref=f7e47] [cursor=pointer]:
+              - /url: /assets
+        - generic [ref=f7e53]:
+          - button "View notifications" [ref=f7e55] [cursor=pointer]
+          - generic [ref=f7e59]:
+            - button "Sunil Mehta Sunil" [active] [ref=f7e60] [cursor=pointer]:
+              - img "Sunil Mehta" [ref=f7e61]
+              - generic [ref=f7e62]: Sunil
+            - generic [ref=f7e171]:
+              - generic [ref=f7e172]:
+                - paragraph [ref=f7e173]: Sunil Mehta
+                - paragraph [ref=f7e174]: manager@fixflow.edu
+                - generic [ref=f7e175]:
+                  - generic [ref=f7e176]: Facility Manager
+                  - generic [ref=f7e177]: Active Session
+              - generic [ref=f7e179]:
+                - generic [ref=f7e180]: Department
+                - text: Central Facilities Operations
+              - button "Sign Out" [ref=f7e182] [cursor=pointer]
+    - main [ref=f7e65]:
+      - generic [ref=f7e66]:
+        - generic [ref=f7e67]:
+          - generic [ref=f7e68]:
+            - text: Facility Manager Command Center
+            - heading "Operations & Triage Command" [level=1] [ref=f7e69]
+            - paragraph [ref=f7e70]:
+              - text: "Director of Operations:"
+              - strong [ref=f7e71]: Sunil Mehta
+              - text: • Active Triage Engine & SLA Monitor
+          - generic [ref=f7e72]:
+            - generic [ref=f7e73]:
+              - generic [ref=f7e74]: 94.6%
+              - generic [ref=f7e75]: SLA Met
+            - generic [ref=f7e76]:
+              - generic [ref=f7e77]: 3.8h
+              - generic [ref=f7e78]: Mean MTTR
+        - generic [ref=f7e79]:
+          - generic [ref=f7e80] [cursor=pointer]:
+            - generic [ref=f7e81]: Triage Queue
+            - generic [ref=f7e84]:
+              - generic [ref=f7e85]: "1"
+              - generic [ref=f7e86]: Needs Dispatch
+          - generic [ref=f7e87] [cursor=pointer]:
+            - generic [ref=f7e88]: Repairs for Review
+            - generic [ref=f7e94]:
+              - generic [ref=f7e95]: "1"
+              - generic [ref=f7e96]: Pending Sign-off
+          - generic [ref=f7e97] [cursor=pointer]:
+            - generic [ref=f7e98]: Active Work Orders
+            - generic [ref=f7e105]:
+              - generic [ref=f7e106]: "2"
+              - generic [ref=f7e107]: Field Operations
+          - generic [ref=f7e108]:
+            - generic [ref=f7e109]: Critical / High Severity
+            - generic [ref=f7e113]:
+              - generic [ref=f7e114]: "3"
+              - generic [ref=f7e115]: Priority 1 & 2
+        - generic [ref=f7e116]:
+          - button "Triage & Dispatch Queue (1)" [ref=f7e117] [cursor=pointer]
+          - button "Verification Studio" [ref=f7e118] [cursor=pointer]
+          - button "All Work Orders (3)" [ref=f7e121] [cursor=pointer]
+        - generic [ref=f7e123]:
+          - generic [ref=f7e124]:
+            - generic [ref=f7e125]:
+              - generic [ref=f7e126]: REQ-2026-0103
+              - generic [ref=f7e127]: Triaged
+              - generic [ref=f7e130]: Medium
+              - generic [ref=f7e131]: "Score: 58/100"
+            - heading "Overheating ceiling projector with grinding fan noise" [level=3] [ref=f7e132] [cursor=pointer]
+            - generic [ref=f7e133]:
+              - generic [ref=f7e134]: Turing Hall — Lecture Hall 402
+              - generic [ref=f7e138]: •
+              - generic [ref=f7e139]: "Reported by: Alex Rivera"
+              - generic [ref=f7e140]: •
+              - generic [ref=f7e141]: 6 Community Votes
+            - paragraph [ref=f7e142]: Lecture Hall 402 laser projector shuts down with thermal overload indicator after 15 minutes of lecture projection. Loud audible grinding bearing noise coming from exhaust fan.
+          - generic [ref=f7e143]:
+            - button "Dispatch Work Order" [ref=f7e144] [cursor=pointer]
+            - generic [ref=f7e152]:
+              - button "Override Score" [ref=f7e153] [cursor=pointer]
+              - button "Merge Duplicates" [ref=f7e157] [cursor=pointer]
+    - contentinfo [ref=f7e164]:
+      - generic [ref=f7e165]:
+        - generic [ref=f7e166]: FixFlow Operations v1.0 • Built with Next.js, Apollo GraphQL & PostgreSQL
+        - generic [ref=f7e167]:
+          - generic [ref=f7e168]: "SLA Target: 95%"
+          - generic [ref=f7e169]: •
+          - generic [ref=f7e170]: Real-time Event Bridge Active

@@ -1,0 +1,41 @@
+- generic [active] [ref=f7e1]:
+  - alert [ref=f7e30]
+  - generic [ref=f7e187]:
+    - generic [ref=f7e188]:
+      - generic [ref=f7e189]: Institutional Portal Access
+      - generic [ref=f7e192]:
+        - generic [ref=f7e193]: F
+        - heading "FixFlow" [level=1] [ref=f7e194]
+      - paragraph [ref=f7e195]: Campus Maintenance & Asset Lifecycle Platform
+    - generic [ref=f7e196]:
+      - generic [ref=f7e197]:
+        - generic [ref=f7e198]:
+          - generic [ref=f7e199]:
+            - generic [ref=f7e200]: Institutional Email
+            - textbox "user@fixflow.edu" [ref=f7e202]: manager@fixflow.edu
+          - generic [ref=f7e203]:
+            - generic [ref=f7e204]: Password
+            - textbox "••••••••" [ref=f7e206]: Manager@123
+          - button "Sign In to Station" [ref=f7e207] [cursor=pointer]
+        - generic [ref=f7e211]:
+          - generic [ref=f7e212]:
+            - generic [ref=f7e213]: Institutional Accounts
+            - generic [ref=f7e214]: Tap to populate
+          - generic [ref=f7e215]:
+            - button "Manager manager@fixflow.edu Triage & Dispatch" [ref=f7e216] [cursor=pointer]:
+              - generic [ref=f7e217]: Manager
+              - generic [ref=f7e221]: manager@fixflow.edu
+              - generic [ref=f7e222]: Triage & Dispatch
+            - button "Technician tech.rahul@fixflow.edu Workbench & Evidence" [ref=f7e223] [cursor=pointer]:
+              - generic [ref=f7e224]: Technician
+              - generic [ref=f7e231]: tech.rahul@fixflow.edu
+              - generic [ref=f7e232]: Workbench & Evidence
+            - button "Requester student.riya@fixflow.edu Report & Upvote" [ref=f7e233] [cursor=pointer]:
+              - generic [ref=f7e234]: Requester
+              - generic [ref=f7e240]: student.riya@fixflow.edu
+              - generic [ref=f7e241]: Report & Upvote
+            - button "Admin admin@fixflow.edu Governance & Audits" [ref=f7e242] [cursor=pointer]:
+              - generic [ref=f7e243]: Admin
+              - generic [ref=f7e247]: admin@fixflow.edu
+              - generic [ref=f7e248]: Governance & Audits
+      - paragraph [ref=f7e250]: Protected by institutional role-based access control (RBAC).

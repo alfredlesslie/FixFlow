@@ -1,0 +1,41 @@
+- generic [active] [ref=f6e1]:
+  - generic [ref=f6e2]:
+    - generic [ref=f6e3]:
+      - generic [ref=f6e4]: Institutional Portal Access
+      - generic [ref=f6e7]:
+        - generic [ref=f6e8]: F
+        - heading "FixFlow" [level=1] [ref=f6e9]
+      - paragraph [ref=f6e10]: Campus Maintenance & Asset Lifecycle Platform
+    - generic [ref=f6e11]:
+      - generic [ref=f6e12]:
+        - generic [ref=f6e13]:
+          - generic [ref=f6e14]:
+            - generic [ref=f6e15]: Institutional Email
+            - textbox "user@fixflow.edu" [ref=f6e17]: manager@fixflow.edu
+          - generic [ref=f6e18]:
+            - generic [ref=f6e19]: Password
+            - textbox "••••••••" [ref=f6e21]: Manager@123
+          - button "Sign In to Station" [ref=f6e22] [cursor=pointer]
+        - generic [ref=f6e26]:
+          - generic [ref=f6e27]:
+            - generic [ref=f6e28]: Institutional Accounts
+            - generic [ref=f6e29]: Tap to populate
+          - generic [ref=f6e30]:
+            - button "Manager manager@fixflow.edu Triage & Dispatch" [ref=f6e31] [cursor=pointer]:
+              - generic [ref=f6e32]: Manager
+              - generic [ref=f6e36]: manager@fixflow.edu
+              - generic [ref=f6e37]: Triage & Dispatch
+            - button "Technician tech.rahul@fixflow.edu Workbench & Evidence" [ref=f6e38] [cursor=pointer]:
+              - generic [ref=f6e39]: Technician
+              - generic [ref=f6e46]: tech.rahul@fixflow.edu
+              - generic [ref=f6e47]: Workbench & Evidence
+            - button "Requester student.riya@fixflow.edu Report & Upvote" [ref=f6e48] [cursor=pointer]:
+              - generic [ref=f6e49]: Requester
+              - generic [ref=f6e55]: student.riya@fixflow.edu
+              - generic [ref=f6e56]: Report & Upvote
+            - button "Admin admin@fixflow.edu Governance & Audits" [ref=f6e57] [cursor=pointer]:
+              - generic [ref=f6e58]: Admin
+              - generic [ref=f6e62]: admin@fixflow.edu
+              - generic [ref=f6e63]: Governance & Audits
+      - paragraph [ref=f6e65]: Protected by institutional role-based access control (RBAC).
+  - alert [ref=f6e66]

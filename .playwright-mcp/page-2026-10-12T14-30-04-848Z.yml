@@ -1,0 +1,170 @@
+- generic [ref=f1e1]:
+  - generic [ref=f1e2]:
+    - generic [ref=f1e3]:
+      - generic [ref=f1e4]:
+        - generic [ref=f1e6]: Role Sandbox
+        - generic [ref=f1e7]: •
+        - generic [ref=f1e8]:
+          - text: "Active Persona:"
+          - strong [ref=f1e9]: Alex Rivera
+          - text: (Computer Science (Undergrad))
+      - generic [ref=f1e10]:
+        - button "Requester" [ref=f1e11] [cursor=pointer]
+        - button "Technician" [ref=f1e17] [cursor=pointer]
+        - button "Facility Manager" [ref=f1e24] [cursor=pointer]
+        - button "Administrator" [ref=f1e28] [cursor=pointer]
+    - banner [ref=f1e32]:
+      - generic [ref=f1e33]:
+        - generic [ref=f1e34]:
+          - link "FixFlow Campus Ops Lifecycle & Maintenance" [ref=f1e35] [cursor=pointer]:
+            - /url: /
+            - generic [ref=f1e41]:
+              - generic [ref=f1e42]:
+                - text: FixFlow
+                - generic [ref=f1e43]: Campus Ops
+              - generic [ref=f1e44]: Lifecycle & Maintenance
+          - navigation [ref=f1e45]:
+            - link "Dashboard" [ref=f1e46] [cursor=pointer]:
+              - /url: /
+            - link "Assets & Locations" [ref=f1e47] [cursor=pointer]:
+              - /url: /assets
+        - generic [ref=f1e53]:
+          - button "View notifications" [ref=f1e55] [cursor=pointer]
+          - button "Alex Rivera Alex" [ref=f1e60] [cursor=pointer]:
+            - img "Alex Rivera" [ref=f1e61]
+            - generic [ref=f1e62]: Alex
+    - main [ref=f1e65]:
+      - generic [ref=f1e66]:
+        - generic [ref=f1e67]:
+          - button [ref=f1e68] [cursor=pointer]:
+            - generic [ref=f1e74]:
+              - paragraph [ref=f1e75]: Requester Portal
+              - paragraph [ref=f1e76]: Report issues, duplicate detection, upvoting
+          - button [ref=f1e77] [cursor=pointer]:
+            - generic [ref=f1e84]:
+              - paragraph [ref=f1e85]: Technician Workbench
+              - paragraph [ref=f1e86]: Work order execution, SLA clock, photo evidence
+          - button [ref=f1e87] [cursor=pointer]:
+            - generic [ref=f1e91]:
+              - paragraph [ref=f1e92]: Command Center
+              - paragraph [ref=f1e93]: Triage, dynamic priority override, dispatch
+          - button [ref=f1e94] [cursor=pointer]:
+            - generic [ref=f1e98]:
+              - paragraph [ref=f1e99]: Administrator Console
+              - paragraph [ref=f1e100]: Governance, audit explorer, system telemetry
+        - generic [ref=f1e473]:
+          - generic [ref=f1e474]:
+            - generic [ref=f1e475]:
+              - text: Technician Workbench
+              - heading "Field Dispatch & Repair Orders" [level=1] [ref=f1e476]
+              - paragraph [ref=f1e477]:
+                - text: "Assigned to:"
+                - strong [ref=f1e478]: Marcus Vance
+                - text: • HVAC & Electrical Maintenance
+            - generic [ref=f1e479]:
+              - generic [ref=f1e480]:
+                - generic [ref=f1e481]: "0"
+                - text: Active Jobs
+              - generic [ref=f1e482]:
+                - generic [ref=f1e483]: "1"
+                - text: Completed
+          - generic [ref=f1e484]:
+            - button "All Assigned (2)" [ref=f1e485] [cursor=pointer]
+            - button "In Progress (0)" [ref=f1e486] [cursor=pointer]
+            - button "Pending / Accepted (1)" [ref=f1e487] [cursor=pointer]
+            - button "Awaiting Verification (1)" [ref=f1e488] [cursor=pointer]
+          - generic [ref=f1e489]:
+            - generic [ref=f1e490]:
+              - generic [ref=f1e491]:
+                - generic [ref=f1e492]:
+                  - generic [ref=f1e493]: WO-2026-0042
+                  - generic [ref=f1e494]: Accepted
+                  - generic [ref=f1e497]: High
+                - heading "Wheelchair access ramp automatic door jammed halfway" [level=3] [ref=f1e498]
+                - generic [ref=f1e499]:
+                  - generic [ref=f1e500]: North Quad — Residence Hall B Entrance
+                  - generic [ref=f1e504]: •
+                  - generic [ref=f1e505]: Besam Automated Door Operator SW200
+                - paragraph [ref=f1e506]: "Diagnosis: Electromechanical clutch gear slipping. Needs motor gearbox calibration."
+              - generic [ref=f1e507]:
+                - generic [ref=f1e508]: 8h Remaining
+                - button "Execute Work" [active] [ref=f1e513] [cursor=pointer]
+            - generic [ref=f1e518]:
+              - generic [ref=f1e519]:
+                - generic [ref=f1e520]:
+                  - generic [ref=f1e521]: WO-2026-0043
+                  - generic [ref=f1e522]: Completed
+                  - generic [ref=f1e525]: Critical
+                - heading "Walk-in refrigeration condenser temperature alarm" [level=3] [ref=f1e526]
+                - generic [ref=f1e527]:
+                  - generic [ref=f1e528]: Student Union — Central Dining Kitchen
+                  - generic [ref=f1e532]: •
+                  - generic [ref=f1e533]: Norlake Dual-Temp Walk-in Condenser
+                - paragraph [ref=f1e534]: "Diagnosis: Defrost heating element short circuit triggered high-limit thermal cutoff."
+              - generic [ref=f1e535]:
+                - generic [ref=f1e536]: 1h Remaining
+                - button "Review Repair" [ref=f1e541] [cursor=pointer]
+          - dialog [ref=f1e546]:
+            - generic [ref=f1e548]:
+              - generic [ref=f1e549]:
+                - generic [ref=f1e550]:
+                  - heading "WO-2026-0042 Work Order Execution" [level=3] [ref=f1e551]:
+                    - generic [ref=f1e552]:
+                      - generic [ref=f1e553]: WO-2026-0042
+                      - generic [ref=f1e554]: Work Order Execution
+                  - paragraph [ref=f1e555]: "Task: Wheelchair access ramp automatic door jammed halfway • North Quad — Residence Hall B Entrance"
+                - button "Close dialog" [ref=f1e556] [cursor=pointer]
+              - generic [ref=f1e561]:
+                - generic [ref=f1e562]:
+                  - generic [ref=f1e563]: "Job Execution State:"
+                  - generic [ref=f1e564]:
+                    - button "ACCEPTED" [ref=f1e565] [cursor=pointer]
+                    - button "IN PROGRESS" [ref=f1e566] [cursor=pointer]
+                    - button "ON HOLD" [ref=f1e567] [cursor=pointer]
+                    - button "COMPLETED" [ref=f1e568] [cursor=pointer]
+                - generic [ref=f1e569]:
+                  - generic [ref=f1e570]: Field Diagnosis & Root Cause
+                  - textbox "Identified root cause (e.g. sheared motor gear, burst gasket, faulty relay)..." [ref=f1e571]: Electromechanical clutch gear slipping. Needs motor gearbox calibration.
+                - generic [ref=f1e572]:
+                  - generic [ref=f1e573]: Corrective Actions Taken
+                  - textbox "Details of corrective action, calibrations performed, and torque specs verified..." [ref=f1e574]
+                - generic [ref=f1e575]:
+                  - generic [ref=f1e576]:
+                    - generic [ref=f1e577]: Parts & Consumables Logged
+                    - generic [ref=f1e580]: "Total Parts Cost: $0.00"
+                  - generic [ref=f1e581]:
+                    - textbox "Part name (e.g. 2-inch ProPress coupling)" [ref=f1e582]
+                    - spinbutton "Qty" [ref=f1e583]: "1"
+                    - spinbutton "Unit $" [ref=f1e584]: "25"
+                    - button "Add" [ref=f1e585] [cursor=pointer]
+                - generic [ref=f1e589]:
+                  - generic [ref=f1e591]:
+                    - heading "Repair Evidence Studio (Before & After)" [level=4] [ref=f1e592]
+                    - paragraph [ref=f1e596]: Facility Managers verify quality and issue resolution against photographic evidence.
+                  - generic [ref=f1e597]:
+                    - generic [ref=f1e598]:
+                      - generic [ref=f1e599]: Before Repair (Reported)
+                      - img "Before" [ref=f1e602]
+                    - generic [ref=f1e603]:
+                      - generic [ref=f1e604]:
+                        - generic [ref=f1e605]: After Repair (Evidence)
+                        - generic [ref=f1e606]: "Attached: 0"
+                      - generic [ref=f1e607]: Attach verified completion photo
+                      - generic [ref=f1e608]:
+                        - generic [ref=f1e609]: "Attach:"
+                        - button "+ Repair Photo 1" [ref=f1e610] [cursor=pointer]
+                        - button "+ Repair Photo 2" [ref=f1e611] [cursor=pointer]
+                        - button "+ Repair Photo 3" [ref=f1e612] [cursor=pointer]
+                - generic [ref=f1e613]:
+                  - button "Close" [ref=f1e614] [cursor=pointer]
+                  - generic [ref=f1e616]:
+                    - button "Save Progress" [ref=f1e617] [cursor=pointer]
+                    - button "Submit for FM Verification" [ref=f1e619] [cursor=pointer]
+    - contentinfo [ref=f1e277]:
+      - generic [ref=f1e278]:
+        - generic [ref=f1e279]: FixFlow Operations v1.0 • Built with Next.js, Apollo GraphQL & PostgreSQL
+        - generic [ref=f1e280]:
+          - generic [ref=f1e281]: "SLA Target: 95%"
+          - generic [ref=f1e282]: •
+          - generic [ref=f1e283]: Real-time Event Bridge Active
+  - alert [ref=f1e284]

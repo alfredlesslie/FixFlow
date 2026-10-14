@@ -1,0 +1,6 @@
+[      59ms] [VERBOSE] [DOM] Input elements should have autocomplete attributes (suggested: "current-password"): (More info: https://goo.gl/9p2vKq) @ http://localhost:3000/login:0
+[   10081ms] [LOG] Download the Apollo DevTools for a better development experience: %s https://chrome.google.com/webstore/detail/apollo-client-developer-t/jdkknkkbebbapilgoeccciglkfbmbnfm @ http://localhost:3000/_next/static/chunks/836-e22f42829701278a.js:12
+[   11304ms] [VERBOSE] [DOM] Input elements should have autocomplete attributes (suggested: "current-password"): (More info: https://goo.gl/9p2vKq) @ http://localhost:3000/login:0
+[   21330ms] [LOG] Download the Apollo DevTools for a better development experience: %s https://chrome.google.com/webstore/detail/apollo-client-developer-t/jdkknkkbebbapilgoeccciglkfbmbnfm @ http://localhost:3000/_next/static/chunks/836-e22f42829701278a.js:12
+[   59804ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://localhost:4000/graphql:0
+[  132433ms] [VERBOSE] [DOM] Input elements should have autocomplete attributes (suggested: "current-password"): (More info: https://goo.gl/9p2vKq) @ http://localhost:3000/login:0

@@ -1,0 +1,155 @@
+- generic [active] [ref=f7e1]:
+  - alert [ref=f7e30]
+  - generic [ref=f7e251]:
+    - banner [ref=f7e252]:
+      - generic [ref=f7e253]:
+        - generic [ref=f7e254]:
+          - link "FixFlow Campus Ops Lifecycle & Maintenance" [ref=f7e255] [cursor=pointer]:
+            - /url: /
+            - generic [ref=f7e261]:
+              - generic [ref=f7e262]:
+                - text: FixFlow
+                - generic [ref=f7e263]: Campus Ops
+              - generic [ref=f7e264]: Lifecycle & Maintenance
+          - navigation [ref=f7e265]:
+            - link "Dashboard" [ref=f7e266] [cursor=pointer]:
+              - /url: /
+            - link "Assets & Locations" [ref=f7e267] [cursor=pointer]:
+              - /url: /assets
+        - generic [ref=f7e273]:
+          - button "View notifications" [ref=f7e275] [cursor=pointer]
+          - button "Riya Sharma Riya" [ref=f7e280] [cursor=pointer]:
+            - img "Riya Sharma" [ref=f7e281]
+            - generic [ref=f7e282]: Riya
+    - main [ref=f7e285]:
+      - generic [ref=f7e286]:
+        - generic [ref=f7e287]:
+          - generic [ref=f7e288]:
+            - text: Requester Portal
+            - heading "Welcome back, Riya Sharma" [level=1] [ref=f7e289]
+            - paragraph [ref=f7e290]: Report facility issues across campus, monitor repair progress in real-time, or upvote existing notices to accelerate priority dispatch.
+          - button "Report an Issue" [ref=f7e292] [cursor=pointer]
+        - generic [ref=f7e296]:
+          - generic [ref=f7e297] [cursor=pointer]:
+            - paragraph [ref=f7e298]: Campus Issues
+            - generic [ref=f7e299]:
+              - generic [ref=f7e300]: "4"
+              - generic [ref=f7e301]: Total Active
+          - generic [ref=f7e302] [cursor=pointer]:
+            - paragraph [ref=f7e303]: Reported by Me
+            - generic [ref=f7e304]:
+              - generic [ref=f7e305]: "0"
+              - generic [ref=f7e306]: My Tickets
+          - generic [ref=f7e307] [cursor=pointer]:
+            - paragraph [ref=f7e308]: Upvoted by Me
+            - generic [ref=f7e309]:
+              - generic [ref=f7e310]: "0"
+              - generic [ref=f7e311]: Supported
+          - generic [ref=f7e312] [cursor=pointer]:
+            - paragraph [ref=f7e313]: Critical Emergencies
+            - generic [ref=f7e314]:
+              - generic [ref=f7e315]: "2"
+              - generic [ref=f7e316]: Urgent
+        - generic [ref=f7e319]:
+          - textbox "Search by title, location, room number, or REQ-id..." [ref=f7e324]
+          - generic [ref=f7e325]:
+            - generic [ref=f7e326]: "Category:"
+            - button "ALL" [ref=f7e329] [cursor=pointer]
+            - button "Plumbing" [ref=f7e330] [cursor=pointer]
+            - button "Infrastructure & Safety" [ref=f7e331] [cursor=pointer]
+            - button "Audio-Visual & IT" [ref=f7e332] [cursor=pointer]
+            - button "HVAC & Refrigeration" [ref=f7e333] [cursor=pointer]
+        - generic [ref=f7e334]:
+          - paragraph [ref=f7e336]: Showing 4 Issues
+          - generic [ref=f7e337]:
+            - generic [ref=f7e338]:
+              - generic [ref=f7e339]:
+                - generic [ref=f7e340]:
+                  - generic [ref=f7e341]:
+                    - generic [ref=f7e342]: REQ-2026-0101
+                    - generic [ref=f7e343]: In Progress
+                  - generic [ref=f7e346]: Critical
+                - heading "Ceiling water pipe active leak dripping over study carrels" [level=3] [ref=f7e347] [cursor=pointer]
+                - paragraph [ref=f7e348]: Continuous water dripping from the ceiling acoustic tiles directly above desks 14-18. Puddle forming on carpet with noticeable ceiling tile sagging. Potential electrical risk if it reaches floor power conduits.
+                - generic [ref=f7e349]:
+                  - generic [ref=f7e350]: Central Library — 2nd Floor Study Commons
+                  - generic [ref=f7e355]:
+                    - generic [ref=f7e356]:
+                      - text: "Category:"
+                      - strong [ref=f7e357]: Plumbing
+                    - generic [ref=f7e358]: 10/12/2026
+              - generic [ref=f7e359]:
+                - button "Upvote (13)" [ref=f7e360] [cursor=pointer]:
+                  - generic [ref=f7e363]: Upvote
+                  - generic [ref=f7e364]: (13)
+                - button "View Timeline" [ref=f7e365] [cursor=pointer]
+            - generic [ref=f7e369]:
+              - generic [ref=f7e370]:
+                - generic [ref=f7e371]:
+                  - generic [ref=f7e372]:
+                    - generic [ref=f7e373]: REQ-2026-0102
+                    - generic [ref=f7e374]: Assigned
+                  - generic [ref=f7e377]: High
+                - heading "Wheelchair access ramp automatic door jammed halfway" [level=3] [ref=f7e378] [cursor=pointer]
+                - paragraph [ref=f7e379]: The ADA automatic push-button door actuator at the north main entrance clicks repeatedly but the telescoping arm is stuck at a 30-degree open angle. Blocks accessibility access to the residential hall.
+                - generic [ref=f7e380]:
+                  - generic [ref=f7e381]: North Quad — Residence Hall B Entrance
+                  - generic [ref=f7e386]:
+                    - generic [ref=f7e387]:
+                      - text: "Category:"
+                      - strong [ref=f7e388]: Infrastructure & Safety
+                    - generic [ref=f7e389]: 10/12/2026
+              - generic [ref=f7e390]:
+                - button "Upvote (9)" [ref=f7e391] [cursor=pointer]:
+                  - generic [ref=f7e394]: Upvote
+                  - generic [ref=f7e395]: (9)
+                - button "View Timeline" [ref=f7e396] [cursor=pointer]
+            - generic [ref=f7e400]:
+              - generic [ref=f7e401]:
+                - generic [ref=f7e402]:
+                  - generic [ref=f7e403]:
+                    - generic [ref=f7e404]: REQ-2026-0103
+                    - generic [ref=f7e405]: Triaged
+                  - generic [ref=f7e408]: Medium
+                - heading "Overheating ceiling projector with grinding fan noise" [level=3] [ref=f7e409] [cursor=pointer]
+                - paragraph [ref=f7e410]: Lecture Hall 402 laser projector shuts down with thermal overload indicator after 15 minutes of lecture projection. Loud audible grinding bearing noise coming from exhaust fan.
+                - generic [ref=f7e411]:
+                  - generic [ref=f7e412]: Turing Hall — Lecture Hall 402
+                  - generic [ref=f7e417]:
+                    - generic [ref=f7e418]:
+                      - text: "Category:"
+                      - strong [ref=f7e419]: Audio-Visual & IT
+                    - generic [ref=f7e420]: 10/11/2026
+              - generic [ref=f7e421]:
+                - button "Upvote (6)" [ref=f7e422] [cursor=pointer]:
+                  - generic [ref=f7e425]: Upvote
+                  - generic [ref=f7e426]: (6)
+                - button "View Timeline" [ref=f7e427] [cursor=pointer]
+            - generic [ref=f7e431]:
+              - generic [ref=f7e432]:
+                - generic [ref=f7e433]:
+                  - generic [ref=f7e434]:
+                    - generic [ref=f7e435]: REQ-2026-0104
+                    - generic [ref=f7e436]: Resolved
+                  - generic [ref=f7e439]: Critical
+                - heading "Walk-in refrigeration condenser temperature alarm" [level=3] [ref=f7e440] [cursor=pointer]
+                - paragraph [ref=f7e441]: Commercial walk-in cooler in Main Dining Facility showing ambient temp of 48°F (safe range <= 38°F). Digital controller flashing E04 sensor error.
+                - generic [ref=f7e442]:
+                  - generic [ref=f7e443]: Student Union — Central Dining Kitchen
+                  - generic [ref=f7e448]:
+                    - generic [ref=f7e449]:
+                      - text: "Category:"
+                      - strong [ref=f7e450]: HVAC & Refrigeration
+                    - generic [ref=f7e451]: 10/12/2026
+              - generic [ref=f7e452]:
+                - button "Upvote (3)" [ref=f7e453] [cursor=pointer]:
+                  - generic [ref=f7e456]: Upvote
+                  - generic [ref=f7e457]: (3)
+                - button "View Timeline" [ref=f7e458] [cursor=pointer]
+    - contentinfo [ref=f7e462]:
+      - generic [ref=f7e463]:
+        - generic [ref=f7e464]: FixFlow Operations v1.0 • Built with Next.js, Apollo GraphQL & PostgreSQL
+        - generic [ref=f7e465]:
+          - generic [ref=f7e466]: "SLA Target: 95%"
+          - generic [ref=f7e467]: •
+          - generic [ref=f7e468]: Real-time Event Bridge Active

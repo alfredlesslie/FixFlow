@@ -1,0 +1,186 @@
+- generic [ref=e1]:
+  - generic [ref=e2]:
+    - generic [ref=e3]:
+      - generic [ref=e4]:
+        - generic [ref=e6]: Role Sandbox
+        - generic [ref=e7]: •
+        - generic [ref=e8]:
+          - text: "Active Persona:"
+          - strong [ref=e9]: Sarah Jenkins
+          - text: (Campus Administration)
+      - generic [ref=e10]:
+        - button "Requester" [ref=e11] [cursor=pointer]
+        - button "Technician" [ref=e17] [cursor=pointer]
+        - button "Facility Manager" [ref=e24] [cursor=pointer]
+        - button "Administrator" [ref=e28] [cursor=pointer]
+    - banner [ref=e32]:
+      - generic [ref=e33]:
+        - generic [ref=e34]:
+          - link "FixFlow Campus Ops Lifecycle & Maintenance" [ref=e35] [cursor=pointer]:
+            - /url: /
+            - generic [ref=e41]:
+              - generic [ref=e42]:
+                - text: FixFlow
+                - generic [ref=e43]: Campus Ops
+              - generic [ref=e44]: Lifecycle & Maintenance
+          - navigation [ref=e45]:
+            - link "Dashboard" [ref=e46] [cursor=pointer]:
+              - /url: /
+            - link "Assets & Locations" [ref=e47] [cursor=pointer]:
+              - /url: /assets
+        - generic [ref=e53]:
+          - button "View notifications" [ref=e55] [cursor=pointer]
+          - button "Sarah Jenkins Sarah" [ref=e60] [cursor=pointer]:
+            - img "Sarah Jenkins" [ref=e61]
+            - generic [ref=e62]: Sarah
+    - main [ref=e65]:
+      - generic [ref=e66]:
+        - generic [ref=e67]:
+          - button [active] [ref=e68] [cursor=pointer]:
+            - generic [ref=e74]:
+              - paragraph [ref=e75]: Requester Portal
+              - paragraph [ref=e76]: Report issues, duplicate detection, upvoting
+          - button [ref=e77] [cursor=pointer]:
+            - generic [ref=e84]:
+              - paragraph [ref=e85]: Technician Workbench
+              - paragraph [ref=e86]: Work order execution, SLA clock, photo evidence
+          - button [ref=e87] [cursor=pointer]:
+            - generic [ref=e91]:
+              - paragraph [ref=e92]: Command Center
+              - paragraph [ref=e93]: Triage, dynamic priority override, dispatch
+          - button [ref=e94] [cursor=pointer]:
+            - generic [ref=e98]:
+              - paragraph [ref=e99]: Administrator Console
+              - paragraph [ref=e100]: Governance, audit explorer, system telemetry
+        - generic [ref=e284]:
+          - generic [ref=e285]:
+            - generic [ref=e286]:
+              - text: Requester Portal
+              - heading "Welcome back, Alex Rivera" [level=1] [ref=e287]
+              - paragraph [ref=e288]: Report facility issues across campus, monitor repair progress in real-time, or upvote existing notices to accelerate priority dispatch.
+            - button "Report an Issue" [ref=e290] [cursor=pointer]
+          - generic [ref=e294]:
+            - generic [ref=e295] [cursor=pointer]:
+              - paragraph [ref=e296]: Campus Issues
+              - generic [ref=e297]:
+                - generic [ref=e298]: "4"
+                - generic [ref=e299]: Total Active
+            - generic [ref=e300] [cursor=pointer]:
+              - paragraph [ref=e301]: Reported by Me
+              - generic [ref=e302]:
+                - generic [ref=e303]: "2"
+                - generic [ref=e304]: My Tickets
+            - generic [ref=e305] [cursor=pointer]:
+              - paragraph [ref=e306]: Upvoted by Me
+              - generic [ref=e307]:
+                - generic [ref=e308]: "2"
+                - generic [ref=e309]: Supported
+            - generic [ref=e310] [cursor=pointer]:
+              - paragraph [ref=e311]: Critical Emergencies
+              - generic [ref=e312]:
+                - generic [ref=e313]: "2"
+                - generic [ref=e314]: Urgent
+          - generic [ref=e317]:
+            - textbox "Search by title, location, room number, or REQ-id..." [ref=e322]
+            - generic [ref=e323]:
+              - generic [ref=e324]: "Category:"
+              - button "ALL" [ref=e327] [cursor=pointer]
+              - button "Plumbing" [ref=e328] [cursor=pointer]
+              - button "Infrastructure & Safety" [ref=e329] [cursor=pointer]
+              - button "Audio-Visual & IT" [ref=e330] [cursor=pointer]
+              - button "HVAC & Refrigeration" [ref=e331] [cursor=pointer]
+          - generic [ref=e332]:
+            - paragraph [ref=e334]: Showing 4 Issues
+            - generic [ref=e335]:
+              - generic [ref=e336]:
+                - generic [ref=e337]:
+                  - generic [ref=e338]:
+                    - generic [ref=e339]:
+                      - generic [ref=e340]: REQ-2026-0101
+                      - generic [ref=e341]: In Progress
+                    - generic [ref=e344]: Critical
+                  - heading "Ceiling water pipe active leak dripping over study carrels" [level=3] [ref=e345] [cursor=pointer]
+                  - paragraph [ref=e346]: Continuous water dripping from the ceiling acoustic tiles directly above desks 14-18. Puddle forming on carpet with noticeable ceiling tile sagging. Potential electrical risk if it reaches floor power conduits.
+                  - generic [ref=e347]:
+                    - generic [ref=e348]: Central Library — 2nd Floor Study Commons
+                    - generic [ref=e353]:
+                      - generic [ref=e354]:
+                        - text: "Category:"
+                        - strong [ref=e355]: Plumbing
+                      - generic [ref=e356]: 10/12/2026
+                - generic [ref=e357]:
+                  - button "Upvoted (14)" [ref=e358] [cursor=pointer]:
+                    - generic [ref=e361]: Upvoted
+                    - generic [ref=e362]: (14)
+                  - button "View Timeline" [ref=e363] [cursor=pointer]
+              - generic [ref=e367]:
+                - generic [ref=e368]:
+                  - generic [ref=e369]:
+                    - generic [ref=e370]:
+                      - generic [ref=e371]: REQ-2026-0102
+                      - generic [ref=e372]: Assigned
+                    - generic [ref=e375]: High
+                  - heading "Wheelchair access ramp automatic door jammed halfway" [level=3] [ref=e376] [cursor=pointer]
+                  - paragraph [ref=e377]: The ADA automatic push-button door actuator at the north main entrance clicks repeatedly but the telescoping arm is stuck at a 30-degree open angle. Blocks accessibility access to the residential hall.
+                  - generic [ref=e378]:
+                    - generic [ref=e379]: North Quad — Residence Hall B Entrance
+                    - generic [ref=e384]:
+                      - generic [ref=e385]:
+                        - text: "Category:"
+                        - strong [ref=e386]: Infrastructure & Safety
+                      - generic [ref=e387]: 10/12/2026
+                - generic [ref=e388]:
+                  - button "Upvote (9)" [ref=e389] [cursor=pointer]:
+                    - generic [ref=e392]: Upvote
+                    - generic [ref=e393]: (9)
+                  - button "View Timeline" [ref=e394] [cursor=pointer]
+              - generic [ref=e398]:
+                - generic [ref=e399]:
+                  - generic [ref=e400]:
+                    - generic [ref=e401]:
+                      - generic [ref=e402]: REQ-2026-0103
+                      - generic [ref=e403]: Triaged
+                    - generic [ref=e406]: Medium
+                  - heading "Overheating ceiling projector with grinding fan noise" [level=3] [ref=e407] [cursor=pointer]
+                  - paragraph [ref=e408]: Lecture Hall 402 laser projector shuts down with thermal overload indicator after 15 minutes of lecture projection. Loud audible grinding bearing noise coming from exhaust fan.
+                  - generic [ref=e409]:
+                    - generic [ref=e410]: Turing Hall — Lecture Hall 402
+                    - generic [ref=e415]:
+                      - generic [ref=e416]:
+                        - text: "Category:"
+                        - strong [ref=e417]: Audio-Visual & IT
+                      - generic [ref=e418]: 10/11/2026
+                - generic [ref=e419]:
+                  - button "Upvoted (6)" [ref=e420] [cursor=pointer]:
+                    - generic [ref=e423]: Upvoted
+                    - generic [ref=e424]: (6)
+                  - button "View Timeline" [ref=e425] [cursor=pointer]
+              - generic [ref=e429]:
+                - generic [ref=e430]:
+                  - generic [ref=e431]:
+                    - generic [ref=e432]:
+                      - generic [ref=e433]: REQ-2026-0104
+                      - generic [ref=e434]: Resolved
+                    - generic [ref=e437]: Critical
+                  - heading "Walk-in refrigeration condenser temperature alarm" [level=3] [ref=e438] [cursor=pointer]
+                  - paragraph [ref=e439]: Commercial walk-in cooler in Main Dining Facility showing ambient temp of 48°F (safe range <= 38°F). Digital controller flashing E04 sensor error.
+                  - generic [ref=e440]:
+                    - generic [ref=e441]: Student Union — Central Dining Kitchen
+                    - generic [ref=e446]:
+                      - generic [ref=e447]:
+                        - text: "Category:"
+                        - strong [ref=e448]: HVAC & Refrigeration
+                      - generic [ref=e449]: 10/12/2026
+                - generic [ref=e450]:
+                  - button "Upvote (3)" [ref=e451] [cursor=pointer]:
+                    - generic [ref=e454]: Upvote
+                    - generic [ref=e455]: (3)
+                  - button "View Timeline" [ref=e456] [cursor=pointer]
+    - contentinfo [ref=e276]:
+      - generic [ref=e277]:
+        - generic [ref=e278]: FixFlow Operations v1.0 • Built with Next.js, Apollo GraphQL & PostgreSQL
+        - generic [ref=e279]:
+          - generic [ref=e280]: "SLA Target: 95%"
+          - generic [ref=e281]: •
+          - generic [ref=e282]: Real-time Event Bridge Active
+  - alert [ref=e283]

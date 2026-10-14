@@ -1,0 +1,34 @@
+- generic [active] [ref=f4e1]:
+  - generic [ref=f4e2]:
+    - generic [ref=f4e3]:
+      - generic [ref=f4e4]: F
+      - heading "Sign In to FixFlow" [level=1] [ref=f4e5]
+      - paragraph [ref=f4e6]: Campus Maintenance & Asset Lifecycle Management Platform
+    - generic [ref=f4e7]:
+      - generic [ref=f4e8]:
+        - generic [ref=f4e9]:
+          - generic [ref=f4e10]:
+            - generic [ref=f4e11]: Institutional Email
+            - textbox "name@fixflow.edu" [ref=f4e13]: manager@fixflow.edu
+          - generic [ref=f4e14]:
+            - generic [ref=f4e15]: Password
+            - textbox "••••••••" [ref=f4e17]: Manager@123
+          - button "Sign In" [ref=f4e18] [cursor=pointer]
+        - generic [ref=f4e22]:
+          - generic [ref=f4e23]: "Demo Quick-Fill by Role:"
+          - generic [ref=f4e29]:
+            - button "Facility Manager manager@fixflow.edu" [ref=f4e30] [cursor=pointer]:
+              - generic [ref=f4e31]: Facility Manager
+              - generic [ref=f4e32]: manager@fixflow.edu
+            - button "Technician tech.rahul@fixflow.edu" [ref=f4e33] [cursor=pointer]:
+              - generic [ref=f4e34]: Technician
+              - generic [ref=f4e35]: tech.rahul@fixflow.edu
+            - button "Requester (Student) student.riya@fixflow.edu" [ref=f4e36] [cursor=pointer]:
+              - generic [ref=f4e37]: Requester (Student)
+              - generic [ref=f4e38]: student.riya@fixflow.edu
+            - button "Administrator admin@fixflow.edu" [ref=f4e39] [cursor=pointer]:
+              - generic [ref=f4e40]: Administrator
+              - generic [ref=f4e41]: admin@fixflow.edu
+      - link "← Return to FixFlow Overview" [ref=f4e43] [cursor=pointer]:
+        - /url: /
+  - alert [ref=f4e45]

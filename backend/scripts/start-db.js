@@ -11,7 +11,7 @@ async function main() {
 
   const pg = new EmbeddedPostgres({
     databaseDir: dataDir,
-    port: 5432,
+    port: 5433,
     user: 'postgres',
     password: 'postgres',
     initialDatabase: 'fixflow_db',
@@ -24,9 +24,9 @@ async function main() {
     console.log('[FixFlow DB] Cluster initialized successfully.');
   }
 
-  console.log('[FixFlow DB] Starting PostgreSQL on port 5432...');
+  console.log('[FixFlow DB] Starting PostgreSQL on port 5433...');
   await pg.start();
-  console.log('[FixFlow DB] PostgreSQL is now running on postgresql://postgres:postgres@localhost:5432/fixflow_db');
+  console.log('[FixFlow DB] PostgreSQL is now running on postgresql://postgres:postgres@localhost:5433/fixflow_db');
 
   // Handle termination signals
   const shutdown = async () => {

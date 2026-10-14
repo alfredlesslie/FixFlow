@@ -1,43 +1,74 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/lib/auth-context';
-import { ShieldCheck, Lock, Mail, ArrowRight, UserCheck, AlertCircle, Loader2 } from 'lucide-react';
+import { getRoleRedirectPath } from '@/lib/role-routing';
+import {
+  Lock,
+  Mail,
+  ArrowRight,
+  UserCheck,
+  AlertCircle,
+  Loader2,
+  Wrench,
+  Shield,
+  HardHat,
+  Sparkles,
+} from 'lucide-react';
 
 export default function LoginPage() {
   const router = useRouter();
-  const { login, isAuthenticated } = useAuth();
+  const { login, isAuthenticated, user } = useAuth();
 
   const [email, setEmail] = useState('manager@fixflow.edu');
   const [password, setPassword] = useState('Manager@123');
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
+  // If already logged in, redirect straight to their authorized portal
+  useEffect(() => {
+    if (isAuthenticated && user) {
+      router.replace(getRoleRedirectPath(user.role));
+    }
+  }, [isAuthenticated, user, router]);
+
   const presets = [
     {
       role: 'Facility Manager',
+      label: 'Manager',
       email: 'manager@fixflow.edu',
       pass: 'Manager@123',
-      color: 'bg-indigo-50 border-indigo-200 text-indigo-700 hover:bg-indigo-100',
+      icon: <Wrench className="w-3.5 h-3.5 text-indigo-500" />,
+      badge: 'Triage & Dispatch',
+      border: 'hover:border-indigo-400 dark:hover:border-indigo-500',
     },
     {
       role: 'Technician',
+      label: 'Technician',
       email: 'tech.rahul@fixflow.edu',
       pass: 'Tech@123',
-      color: 'bg-emerald-50 border-emerald-200 text-emerald-700 hover:bg-emerald-100',
+      icon: <HardHat className="w-3.5 h-3.5 text-amber-500" />,
+      badge: 'Workbench & Evidence',
+      border: 'hover:border-amber-400 dark:hover:border-amber-500',
     },
     {
-      role: 'Requester (Student)',
+      role: 'Requester',
+      label: 'Requester',
       email: 'student.riya@fixflow.edu',
       pass: 'Student@123',
-      color: 'bg-blue-50 border-blue-200 text-blue-700 hover:bg-blue-100',
+      icon: <UserCheck className="w-3.5 h-3.5 text-sky-500" />,
+      badge: 'Report & Upvote',
+      border: 'hover:border-sky-400 dark:hover:border-sky-500',
     },
     {
       role: 'Administrator',
+      label: 'Admin',
       email: 'admin@fixflow.edu',
       pass: 'Admin@123',
-      color: 'bg-amber-50 border-amber-200 text-amber-700 hover:bg-amber-100',
+      icon: <Shield className="w-3.5 h-3.5 text-emerald-500" />,
+      badge: 'Governance & Audits',
+      border: 'hover:border-emerald-400 dark:hover:border-emerald-500',
     },
   ];
 
@@ -53,45 +84,61 @@ export default function LoginPage() {
     setErrorMsg(null);
 
     try {
-      await login(email, password);
-      router.push('/assets');
+      const authUser = await login(email, password);
+      const targetPath = getRoleRedirectPath(authUser.role);
+      router.push(targetPath);
     } catch (err: any) {
-      setErrorMsg(err.message || 'Authentication failed. Please verify credentials.');
+      setErrorMsg(err.message || 'Authentication failed. Please verify institutional credentials.');
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8 text-slate-900">
-      <div className="sm:mx-auto sm:w-full sm:max-w-md text-center space-y-2">
-        <div className="inline-flex w-12 h-12 rounded-xl bg-brand-600 items-center justify-center text-white font-black text-2xl shadow-sm">
-          F
+    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col justify-center py-12 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
+      {/* Background ambient lighting */}
+      <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[350px] bg-gradient-to-tr from-sky-600/15 to-indigo-600/15 blur-3xl pointer-events-none rounded-full" />
+      <div className="absolute bottom-10 right-10 w-80 h-80 bg-blue-500/10 blur-3xl pointer-events-none rounded-full" />
+
+      <div className="sm:mx-auto sm:w-full sm:max-w-md text-center space-y-3 relative z-10">
+        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-900 border border-slate-800 text-[11px] font-semibold text-sky-400 uppercase tracking-wider">
+          <Sparkles className="w-3.5 h-3.5" />
+          Institutional Portal Access
         </div>
-        <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
-          Sign In to FixFlow
-        </h1>
-        <p className="text-sm text-slate-500">
-          Campus Maintenance & Asset Lifecycle Management Platform
+
+        <div className="flex items-center justify-center gap-3">
+          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-sky-500 to-blue-700 flex items-center justify-center text-white font-bold text-xl shadow-lg shadow-sky-500/25">
+            F
+          </div>
+          <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-white">
+            Fix<span className="text-sky-400">Flow</span>
+          </h1>
+        </div>
+
+        <p className="text-xs sm:text-sm text-slate-400">
+          Campus Maintenance & Asset Lifecycle Platform
         </p>
       </div>
 
-      <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md px-4 sm:px-0">
-        <div className="bg-white py-8 px-6 shadow-sm border border-slate-200 rounded-2xl sm:px-10 space-y-6">
+      <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md relative z-10">
+        <div className="bg-slate-900/90 backdrop-blur-xl py-8 px-6 shadow-2xl border border-slate-800 rounded-3xl sm:px-9 space-y-6">
           {errorMsg && (
-            <div className="p-3.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-xs flex items-start space-x-2">
-              <AlertCircle className="w-4 h-4 text-rose-600 mt-0.5 shrink-0" />
+            <div
+              id="login-error-alert"
+              className="p-3.5 rounded-xl bg-rose-950/60 border border-rose-800/80 text-rose-300 text-xs flex items-start gap-2.5 animate-fadeIn"
+            >
+              <AlertCircle className="w-4 h-4 text-rose-400 mt-0.5 shrink-0" />
               <span>{errorMsg}</span>
             </div>
           )}
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">
+              <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">
                 Institutional Email
               </label>
               <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
+                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-500">
                   <Mail className="w-4 h-4" />
                 </div>
                 <input
@@ -100,18 +147,18 @@ export default function LoginPage() {
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="block w-full pl-10 pr-3 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition"
-                  placeholder="name@fixflow.edu"
+                  className="block w-full pl-10 pr-3.5 py-2.5 text-xs sm:text-sm rounded-xl border border-slate-700 bg-slate-950 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-transparent transition-all"
+                  placeholder="user@fixflow.edu"
                 />
               </div>
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">
+              <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">
                 Password
               </label>
               <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
+                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-500">
                   <Lock className="w-4 h-4" />
                 </div>
                 <input
@@ -120,7 +167,7 @@ export default function LoginPage() {
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="block w-full pl-10 pr-3 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition"
+                  className="block w-full pl-10 pr-3.5 py-2.5 text-xs sm:text-sm rounded-xl border border-slate-700 bg-slate-950 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-transparent transition-all"
                   placeholder="••••••••"
                 />
               </div>
@@ -130,16 +177,16 @@ export default function LoginPage() {
               type="submit"
               id="submit-login-btn"
               disabled={loading}
-              className="w-full flex items-center justify-center space-x-2 py-2.5 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-slate-900 hover:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-slate-900 transition disabled:opacity-50"
+              className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl shadow-lg shadow-sky-600/20 text-xs sm:text-sm font-semibold text-white bg-sky-600 hover:bg-sky-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-sky-500 focus:ring-offset-slate-900 transition-all haptic-press disabled:opacity-50"
             >
               {loading ? (
                 <>
                   <Loader2 className="w-4 h-4 animate-spin" />
-                  <span>Signing In...</span>
+                  <span>Authenticating...</span>
                 </>
               ) : (
                 <>
-                  <span>Sign In</span>
+                  <span>Sign In to Station</span>
                   <ArrowRight className="w-4 h-4" />
                 </>
               )}
@@ -147,34 +194,45 @@ export default function LoginPage() {
           </form>
 
           {/* Quick-Fill Presets for Demonstration */}
-          <div className="pt-4 border-t border-slate-100 space-y-3">
-            <div className="flex items-center space-x-1.5 text-xs text-slate-500 font-medium">
-              <UserCheck className="w-3.5 h-3.5 text-brand-600" />
-              <span>Demo Quick-Fill by Role:</span>
+          <div className="pt-5 border-t border-slate-800 space-y-3">
+            <div className="flex items-center justify-between">
+              <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">
+                Institutional Accounts
+              </span>
+              <span className="text-[10px] text-slate-500">Tap to populate</span>
             </div>
+
             <div className="grid grid-cols-2 gap-2">
-              {presets.map((p) => (
-                <button
-                  key={p.role}
-                  type="button"
-                  onClick={() => handleSelectPreset(p)}
-                  className={`text-xs p-2 rounded-lg border text-left font-medium transition ${p.color}`}
-                >
-                  <div className="font-bold">{p.role}</div>
-                  <div className="text-[10px] opacity-75 truncate">{p.email}</div>
-                </button>
-              ))}
+              {presets.map((p) => {
+                const isSelected = email === p.email;
+                return (
+                  <button
+                    key={p.role}
+                    type="button"
+                    onClick={() => handleSelectPreset(p)}
+                    className={`text-left p-2.5 rounded-xl border transition-all haptic-press ${
+                      isSelected
+                        ? 'bg-slate-800 border-sky-500/80 shadow-sm'
+                        : 'bg-slate-950/70 border-slate-800/80 text-slate-300 ' + p.border
+                    }`}
+                  >
+                    <div className="flex items-center gap-1.5 font-bold text-xs text-white">
+                      {p.icon}
+                      <span>{p.label}</span>
+                    </div>
+                    <div className="text-[10px] text-slate-400 truncate mt-0.5">{p.email}</div>
+                    <div className="text-[9px] text-slate-500 mt-1">{p.badge}</div>
+                  </button>
+                );
+              })}
             </div>
           </div>
         </div>
 
         <div className="text-center mt-6">
-          <a
-            href="/"
-            className="text-xs text-slate-500 hover:text-slate-800 transition font-medium inline-flex items-center space-x-1"
-          >
-            <span>&larr; Return to FixFlow Overview</span>
-          </a>
+          <p className="text-xs text-slate-500">
+            Protected by institutional role-based access control (RBAC).
+          </p>
         </div>
       </div>
     </div>
