@@ -161,3 +161,26 @@ export interface DuplicateCandidate {
   upvotes: number;
   createdAt: string;
 }
+
+export type ApplicationStatus = 'PENDING_REVIEW' | 'APPROVED' | 'REJECTED';
+
+export interface RegistrationApplication {
+  id: string;
+  applicantName: string;
+  applicantEmail: string;
+  institutionalId: string;
+  department: string;
+  contactNumber: string;
+  requestedRole: 'TECHNICIAN' | 'FACILITY_MANAGER' | 'REQUESTER';
+  emailVerified: boolean;
+  status: ApplicationStatus;
+  tradeDiscipline?: string;
+  certificationNumber?: string;
+  yearsExperience?: string;
+  facilityScope?: string;
+  appointmentJustification?: string;
+  rejectionReason?: string;
+  reviewedBy?: string;
+  reviewedAt?: string;
+  submittedAt: string;
+}

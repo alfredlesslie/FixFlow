@@ -18,6 +18,7 @@ import {
 import { useDataBridge } from '@/lib/use-data-bridge';
 import { useAuth } from '@/lib/auth-context';
 import { Badge } from '@/components/ui/Badge';
+import { ThemeToggle } from '@/components/ui/ThemeToggle';
 
 interface AppShellProps {
   children: React.ReactNode;
@@ -90,11 +91,27 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                 <Building2 className="w-3.5 h-3.5" />
                 <span>Assets & Locations</span>
               </Link>
+              {activeUser.role === 'ADMIN' && (
+                <Link
+                  href="/admin/approvals"
+                  className={`px-3 py-1.5 text-xs font-medium rounded-lg transition-colors flex items-center gap-1 ${
+                    pathname.startsWith('/admin/approvals')
+                      ? 'bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white'
+                      : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800/60'
+                  }`}
+                >
+                  <ShieldCheck className="w-3.5 h-3.5 text-sky-500" />
+                  <span>Approvals</span>
+                </Link>
+              )}
             </nav>
           </div>
 
-          {/* Action Tools: Notifications, User Pill */}
+          {/* Action Tools: Theme Toggle, Notifications, User Pill */}
           <div className="flex items-center gap-2.5">
+            {/* Theme Toggle */}
+            <ThemeToggle variant="ghost" />
+
             {/* Notification Bell */}
             <div className="relative">
               <button
@@ -256,6 +273,15 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             >
               Assets & Locations
             </Link>
+            {activeUser.role === 'ADMIN' && (
+              <Link
+                href="/admin/approvals"
+                onClick={() => setIsMobileNavOpen(false)}
+                className="block px-3 py-2 rounded-lg text-sm font-medium text-slate-800 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800"
+              >
+                Account Approvals
+              </Link>
+            )}
             <button
               onClick={() => {
                 setIsMobileNavOpen(false);

@@ -2,43 +2,62 @@
 node_modules/
 /.pnp
 .pnp.js
-playwright-mcp/
-# Testing
-/coverage
 
-# Production
-/build
-/dist
-/.next/
-/out/
+# Playwright & End-to-End Testing Artifacts
+playwright/
+playwright-report/
+test-results/
+blob-report/
+playwright/.cache/
+.playwright/
+.playwright-mcp/
+*.trace.zip
+playwright-results/
 
-# Misc
-.DS_Store
-*.pem
-Thumbs.db
+# Testing & Coverage
+coverage/
+*.lcov
 
-# Debug logs
+# Production & Build Outputs
+.next/
+out/
+build/
+dist/
+*.tsbuildinfo
+
+# Local Database & Embedded PostgreSQL Cluster Data
+**/.postgres-data/
+backend/.postgres-data/
+/backend/prisma/*.db
+/backend/prisma/*.db-journal
+
+# Environment Configuration Files
+.env
+.env.*
+.env*.local
+**/.env
+**/.env.*
+**/.env*.local
+!.env.example
+!.env*.example
+!**/.env.example
+!**/.env*.example
+
+# Debug Logs
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
 
-# Environment files
-.env
-.env*.local
-!.env.example
-!.env*.example
+# Misc & System Files
+.DS_Store
+*.pem
+Thumbs.db
+ehthumbs.db
+[Dd]esktop.ini
 
-# IDE
+# IDE & Editor Settings
 .idea/
 .vscode/
 *.swp
 *.swo
-
-# Prisma
-/backend/prisma/*.db
-/backend/prisma/*.db-journal
-
-# Operating System
-ehthumbs.db
-[Dd]esktop.ini

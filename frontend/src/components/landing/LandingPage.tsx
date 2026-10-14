@@ -28,6 +28,7 @@ import { useAuth } from '@/lib/auth-context';
 import { getRoleRedirectPath } from '@/lib/role-routing';
 import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
+import { ThemeToggle } from '@/components/ui/ThemeToggle';
 
 export function LandingPage() {
   const { user, isAuthenticated } = useAuth();
@@ -37,7 +38,7 @@ export function LandingPage() {
   const roleRedirectUrl = user ? getRoleRedirectPath(user.role) : '/login';
 
   return (
-    <div className="min-h-[100dvh] bg-[#06090e] text-slate-100 selection:bg-sky-500 selection:text-white flex flex-col font-sans">
+    <div className="min-h-[100dvh] bg-slate-50 dark:bg-[#06090e] text-slate-900 dark:text-slate-100 selection:bg-sky-500 selection:text-white flex flex-col font-sans transition-colors duration-200">
       {/* Ambient background glows */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden z-0">
         <div className="absolute -top-40 left-1/2 -translate-x-1/2 w-[720px] h-[380px] bg-sky-600/10 blur-[130px] rounded-full" />
@@ -46,7 +47,7 @@ export function LandingPage() {
       </div>
 
       {/* 1. Header / Navigation Bar */}
-      <header className="sticky top-0 z-40 backdrop-blur-xl bg-[#06090e]/85 border-b border-white/10 transition-colors">
+      <header className="sticky top-0 z-40 backdrop-blur-xl bg-white/85 dark:bg-[#06090e]/85 border-b border-slate-200/80 dark:border-white/10 transition-colors">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
           {/* Logo & Tagline */}
           <Link href="/" className="flex items-center gap-3 group">
@@ -54,34 +55,36 @@ export function LandingPage() {
               <Layers className="w-5 h-5" />
             </div>
             <div className="flex flex-col">
-              <span className="font-bold text-base tracking-tight text-white flex items-center gap-2">
+              <span className="font-bold text-base tracking-tight text-slate-900 dark:text-white flex items-center gap-2">
                 FixFlow
-                <span className="text-[10px] font-semibold uppercase tracking-widest px-1.5 py-0.5 rounded bg-sky-950/80 text-sky-400 border border-sky-800/80">
+                <span className="text-[10px] font-semibold uppercase tracking-widest px-1.5 py-0.5 rounded bg-sky-100 text-sky-800 dark:bg-sky-950/80 dark:text-sky-400 border border-sky-200 dark:border-sky-800/80">
                   Campus Ops
                 </span>
               </span>
-              <span className="text-[11px] text-slate-400">Lifecycle & Maintenance</span>
+              <span className="text-[11px] text-slate-500 dark:text-slate-400">Lifecycle & Maintenance</span>
             </div>
           </Link>
 
           {/* Nav links */}
-          <nav className="hidden md:flex items-center gap-6 text-xs font-medium text-slate-300">
-            <a href="#problems" className="hover:text-white transition-colors">
+          <nav className="hidden md:flex items-center gap-6 text-xs font-medium text-slate-600 dark:text-slate-300">
+            <a href="#problems" className="hover:text-slate-900 dark:hover:text-white transition-colors">
               Challenges
             </a>
-            <a href="#solution" className="hover:text-white transition-colors">
+            <a href="#solution" className="hover:text-slate-900 dark:hover:text-white transition-colors">
               Solution
             </a>
-            <a href="#roles" className="hover:text-white transition-colors">
+            <a href="#roles" className="hover:text-slate-900 dark:hover:text-white transition-colors">
               Operations Roles
             </a>
-            <a href="#lifecycle" className="hover:text-white transition-colors">
+            <a href="#lifecycle" className="hover:text-slate-900 dark:hover:text-white transition-colors">
               Maintenance Lifecycle
             </a>
           </nav>
 
-          {/* Action Button */}
-          <div className="flex items-center gap-3">
+          {/* Action Button & Theme Toggle */}
+          <div className="flex items-center gap-2.5">
+            <ThemeToggle variant="ghost" />
+
             {isAuthenticated && user ? (
               <Link href={roleRedirectUrl}>
                 <Button
@@ -94,17 +97,29 @@ export function LandingPage() {
                 </Button>
               </Link>
             ) : (
-              <Link href="/login">
-                <Button
-                  id="landing-signin-btn"
-                  size="sm"
-                  variant="primary"
-                  className="bg-sky-600 hover:bg-sky-500 text-white font-medium shadow-md shadow-sky-900/30 ring-1 ring-white/20"
-                  trailingIcon={<ArrowRight className="w-3.5 h-3.5" />}
-                >
-                  Sign In
-                </Button>
-              </Link>
+              <div className="flex items-center gap-2">
+                <Link href="/register">
+                  <Button
+                    id="landing-register-nav-btn"
+                    size="sm"
+                    variant="outline"
+                    className="border-slate-300 dark:border-slate-700 bg-white/80 dark:bg-slate-900/80 text-slate-800 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 shadow-sm font-semibold text-xs"
+                  >
+                    Create Account
+                  </Button>
+                </Link>
+                <Link href="/login">
+                  <Button
+                    id="landing-signin-btn"
+                    size="sm"
+                    variant="primary"
+                    className="bg-sky-600 hover:bg-sky-500 text-white font-medium shadow-md shadow-sky-900/30"
+                    trailingIcon={<ArrowRight className="w-3.5 h-3.5" />}
+                  >
+                    Sign In
+                  </Button>
+                </Link>
+              </div>
             )}
           </div>
         </div>
@@ -117,21 +132,21 @@ export function LandingPage() {
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="max-w-3xl mx-auto text-center flex flex-col items-center">
               {/* Eyebrow Tag */}
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-sky-950/60 border border-sky-800/70 text-[11px] font-semibold uppercase tracking-wider text-sky-400 mb-6 shadow-sm">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-sky-100 dark:bg-sky-950/60 border border-sky-200 dark:border-sky-800/70 text-[11px] font-semibold uppercase tracking-wider text-sky-800 dark:text-sky-400 mb-6 shadow-sm">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 dark:bg-emerald-400 animate-pulse" />
                 <span>Campus Infrastructure & Maintenance Intelligence</span>
               </div>
 
               {/* Display Headline */}
-              <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold tracking-tight text-white leading-[1.1] mb-6">
+              <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold tracking-tight text-slate-900 dark:text-white leading-[1.1] mb-6">
                 From Broken to Resolved,{' '}
-                <span className="bg-gradient-to-r from-sky-400 via-blue-300 to-sky-200 bg-clip-text text-transparent">
+                <span className="bg-gradient-to-r from-sky-600 via-blue-500 to-sky-400 dark:from-sky-400 dark:via-blue-300 dark:to-sky-200 bg-clip-text text-transparent">
                   Visible Across Campus.
                 </span>
               </h1>
 
               {/* Subtext */}
-              <p className="text-base sm:text-lg text-slate-300 leading-relaxed mb-8 max-w-[62ch]">
+              <p className="text-base sm:text-lg text-slate-600 dark:text-slate-300 leading-relaxed mb-8 max-w-[62ch]">
                 A unified operational platform connecting students, field specialists, facility managers, and administrators. Eliminate duplicate reports, prioritize urgent repairs with live scoring, and inspect verified evidence before closure.
               </p>
 
@@ -148,23 +163,35 @@ export function LandingPage() {
                     </Button>
                   </Link>
                 ) : (
-                  <Link href="/login" className="w-full sm:w-auto">
-                    <Button
-                      id="hero-signin-btn"
-                      size="lg"
-                      className="w-full sm:w-auto bg-sky-600 hover:bg-sky-500 text-white font-semibold shadow-lg shadow-sky-950/50 ring-1 ring-white/25 px-6 py-3"
-                      trailingIcon={<ArrowRight className="w-4 h-4" />}
-                    >
-                      Access Station / Sign In
-                    </Button>
-                  </Link>
+                  <div className="flex flex-col sm:flex-row items-center gap-3 w-full sm:w-auto">
+                    <Link href="/register" className="w-full sm:w-auto">
+                      <Button
+                        id="hero-register-btn"
+                        size="lg"
+                        className="w-full sm:w-auto bg-sky-600 hover:bg-sky-500 text-white font-semibold shadow-lg shadow-sky-600/25 px-6 py-3"
+                        trailingIcon={<ArrowRight className="w-4 h-4" />}
+                      >
+                        Create Institutional Account
+                      </Button>
+                    </Link>
+                    <Link href="/login" className="w-full sm:w-auto">
+                      <Button
+                        id="hero-signin-btn"
+                        size="lg"
+                        variant="outline"
+                        className="w-full sm:w-auto border-slate-300 dark:border-white/15 bg-white/80 dark:bg-white/[0.04] text-slate-800 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-white/[0.09] px-6 py-3 font-semibold shadow-sm"
+                      >
+                        Sign In to Station
+                      </Button>
+                    </Link>
+                  </div>
                 )}
 
                 <a href="#lifecycle" className="w-full sm:w-auto">
                   <Button
                     size="lg"
                     variant="outline"
-                    className="w-full sm:w-auto border-white/15 bg-white/[0.03] hover:bg-white/[0.08] text-slate-200 hover:text-white px-6 py-3"
+                    className="w-full sm:w-auto border-slate-300 dark:border-white/15 bg-white/60 dark:bg-white/[0.03] hover:bg-slate-100 dark:hover:bg-white/[0.08] text-slate-700 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white px-6 py-3"
                   >
                     Explore Resolution Lifecycle
                   </Button>
@@ -811,16 +838,28 @@ export function LandingPage() {
                     </Button>
                   </Link>
                 ) : (
-                  <Link href="/login">
-                    <Button
-                      id="cta-signin-btn"
-                      size="lg"
-                      className="bg-sky-600 hover:bg-sky-500 text-white font-semibold shadow-lg shadow-sky-950/50 ring-1 ring-white/25 px-8 py-3 text-base"
-                      trailingIcon={<ArrowRight className="w-4 h-4" />}
-                    >
-                      Sign In to Station
-                    </Button>
-                  </Link>
+                  <div className="flex flex-col sm:flex-row items-center justify-center gap-3 w-full sm:w-auto">
+                    <Link href="/register">
+                      <Button
+                        id="bottom-register-btn"
+                        size="lg"
+                        className="bg-sky-600 hover:bg-sky-500 text-white font-semibold shadow-lg shadow-sky-600/25 px-8 py-3 text-base"
+                        trailingIcon={<ArrowRight className="w-4 h-4" />}
+                      >
+                        Create Institutional Account
+                      </Button>
+                    </Link>
+                    <Link href="/login">
+                      <Button
+                        id="cta-signin-btn"
+                        size="lg"
+                        variant="outline"
+                        className="border-slate-300 dark:border-white/20 bg-white/80 dark:bg-white/[0.05] text-slate-800 dark:text-white hover:bg-slate-100 dark:hover:bg-white/[0.1] px-8 py-3 text-base font-semibold shadow-sm"
+                      >
+                        Sign In to Station
+                      </Button>
+                    </Link>
+                  </div>
                 )}
               </div>
             </div>
@@ -829,24 +868,25 @@ export function LandingPage() {
       </main>
 
       {/* 7. Institutional Footer */}
-      <footer className="border-t border-white/10 bg-[#04060a] py-12 text-xs text-slate-400">
+      <footer className="border-t border-slate-200 dark:border-white/10 bg-slate-100/80 dark:bg-[#04060a] py-12 text-xs text-slate-500 dark:text-slate-400">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between gap-6">
           <div className="flex items-center gap-3">
-            <div className="w-7 h-7 rounded-lg bg-sky-600/30 border border-sky-500/30 flex items-center justify-center text-sky-400">
+            <div className="w-7 h-7 rounded-lg bg-sky-600/20 border border-sky-500/30 flex items-center justify-center text-sky-600 dark:text-sky-400">
               <Layers className="w-4 h-4" />
             </div>
             <div>
-              <span className="font-bold text-white text-sm">FixFlow</span>
+              <span className="font-bold text-slate-900 dark:text-white text-sm">FixFlow</span>
               <p className="text-[11px] text-slate-500">Campus Operations & Maintenance Intelligence Platform</p>
             </div>
           </div>
 
-          <div className="flex flex-wrap items-center gap-6 text-slate-400">
-            <a href="#problems" className="hover:text-white transition-colors">Challenges</a>
-            <a href="#solution" className="hover:text-white transition-colors">Solution</a>
-            <a href="#roles" className="hover:text-white transition-colors">Roles</a>
-            <a href="#lifecycle" className="hover:text-white transition-colors">Lifecycle</a>
-            <Link href="/login" className="text-sky-400 hover:text-sky-300 font-medium">Sign In</Link>
+          <div className="flex flex-wrap items-center gap-6 text-slate-600 dark:text-slate-400">
+            <a href="#problems" className="hover:text-slate-900 dark:hover:text-white transition-colors">Challenges</a>
+            <a href="#solution" className="hover:text-slate-900 dark:hover:text-white transition-colors">Solution</a>
+            <a href="#roles" className="hover:text-slate-900 dark:hover:text-white transition-colors">Roles</a>
+            <a href="#lifecycle" className="hover:text-slate-900 dark:hover:text-white transition-colors">Lifecycle</a>
+            <Link href="/register" className="text-sky-600 dark:text-sky-400 hover:underline font-semibold">Create Account</Link>
+            <Link href="/login" className="text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white font-medium">Sign In</Link>
           </div>
 
           <div className="flex items-center gap-3">

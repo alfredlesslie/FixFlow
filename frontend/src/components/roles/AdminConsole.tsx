@@ -22,8 +22,13 @@ import { useDataBridge } from '@/lib/use-data-bridge';
 import { UserRole, AuditLogEntry } from '@/lib/types';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
+import { AdminApprovalsReview } from '@/components/roles/AdminApprovalsReview';
 
-export function AdminConsole() {
+interface AdminConsoleProps {
+  initialTab?: 'users' | 'approvals' | 'audit' | 'system';
+}
+
+export function AdminConsole({ initialTab = 'users' }: AdminConsoleProps) {
   const {
     users,
     auditLogs,
@@ -33,7 +38,7 @@ export function AdminConsole() {
     toggleUserActive,
   } = useDataBridge();
 
-  const [activeTab, setActiveTab] = useState<'users' | 'audit' | 'system'>('users');
+  const [activeTab, setActiveTab] = useState<'users' | 'approvals' | 'audit' | 'system'>(initialTab);
   const [auditFilterAction, setAuditFilterAction] = useState('ALL');
   const [auditSearchQuery, setAuditSearchQuery] = useState('');
 
@@ -82,10 +87,10 @@ export function AdminConsole() {
       </div>
 
       {/* Navigation Tabs */}
-      <div className="flex items-center gap-2 border-b border-slate-200 dark:border-slate-800 pb-2">
+      <div className="flex items-center gap-2 border-b border-slate-200 dark:border-slate-800 pb-2 overflow-x-auto">
         <button
           onClick={() => setActiveTab('users')}
-          className={`px-4 py-2 rounded-xl text-xs font-semibold transition-colors flex items-center gap-2 ${
+          className={`px-4 py-2 rounded-xl text-xs font-semibold transition-colors flex items-center gap-2 shrink-0 ${
             activeTab === 'users'
               ? 'bg-slate-900 text-white dark:bg-sky-500 dark:text-white shadow-sm'
               : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
@@ -95,8 +100,19 @@ export function AdminConsole() {
           <span>User & Role Governance ({users.length})</span>
         </button>
         <button
+          onClick={() => setActiveTab('approvals')}
+          className={`px-4 py-2 rounded-xl text-xs font-semibold transition-colors flex items-center gap-2 shrink-0 ${
+            activeTab === 'approvals'
+              ? 'bg-slate-900 text-white dark:bg-sky-500 dark:text-white shadow-sm'
+              : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
+          }`}
+        >
+          <UserCheck className="w-3.5 h-3.5" />
+          <span>Account Approvals</span>
+        </button>
+        <button
           onClick={() => setActiveTab('audit')}
-          className={`px-4 py-2 rounded-xl text-xs font-semibold transition-colors flex items-center gap-2 ${
+          className={`px-4 py-2 rounded-xl text-xs font-semibold transition-colors flex items-center gap-2 shrink-0 ${
             activeTab === 'audit'
               ? 'bg-slate-900 text-white dark:bg-sky-500 dark:text-white shadow-sm'
               : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
@@ -107,7 +123,7 @@ export function AdminConsole() {
         </button>
         <button
           onClick={() => setActiveTab('system')}
-          className={`px-4 py-2 rounded-xl text-xs font-semibold transition-colors flex items-center gap-2 ${
+          className={`px-4 py-2 rounded-xl text-xs font-semibold transition-colors flex items-center gap-2 shrink-0 ${
             activeTab === 'system'
               ? 'bg-slate-900 text-white dark:bg-sky-500 dark:text-white shadow-sm'
               : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
@@ -117,6 +133,9 @@ export function AdminConsole() {
           <span>Health & Diagnostics</span>
         </button>
       </div>
+
+      {/* TAB: APPROVALS */}
+      {activeTab === 'approvals' && <AdminApprovalsReview />}
 
       {/* TAB 1: USERS & RBAC */}
       {activeTab === 'users' && (
