@@ -20,10 +20,17 @@ export function ProtectedRoute({ children, allowedRoles }: ProtectedRouteProps) 
   useEffect(() => {
     if (!loading && !isAuthenticated) {
       router.replace('/login');
+    } else if (!loading && user && user.status === 'REJECTED') {
+      router.replace(
+        `/pending-approval?status=rejected&email=${encodeURIComponent(user.email)}&role=${user.role}&name=${encodeURIComponent(user.name)}`
+      );
+    } else if (!loading && user && user.status && user.status !== 'ACTIVE') {
+      logout().then(() => router.replace('/login'));
     }
-  }, [loading, isAuthenticated, router]);
+  }, [loading, isAuthenticated, user, logout, router]);
 
-  if (loading) {
+  // Keep protected route in loading state while authentication or user identity/role is resolving
+  if (loading || (isAuthenticated && user && !user.role)) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-slate-950 text-white">
         <div className="flex flex-col items-center gap-3">
@@ -35,6 +42,10 @@ export function ProtectedRoute({ children, allowedRoles }: ProtectedRouteProps) 
   }
 
   if (!isAuthenticated || !user) {
+    return null; // Will redirect via useEffect
+  }
+
+  if (user.status === 'REJECTED' || (user.status && user.status !== 'ACTIVE')) {
     return null; // Will redirect via useEffect
   }
 
@@ -85,8 +96,8 @@ export function ProtectedRoute({ children, allowedRoles }: ProtectedRouteProps) 
             <Button
               variant="outline"
               className="w-full text-rose-600 hover:text-rose-700 hover:bg-rose-50 dark:hover:bg-rose-950/30"
-              onClick={() => {
-                logout();
+              onClick={async () => {
+                await logout();
                 router.push('/login');
               }}
               icon={<LogOut className="w-4 h-4" />}

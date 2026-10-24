@@ -7,7 +7,7 @@ import { TechnicianWorkbench } from '@/components/roles/TechnicianWorkbench';
 
 export default function TechnicianPage() {
   return (
-    <ProtectedRoute allowedRoles={['TECHNICIAN', 'FACILITY_MANAGER', 'ADMIN']}>
+    <ProtectedRoute allowedRoles={['TECHNICIAN']}>
       <AppShell>
         <TechnicianWorkbench />
       </AppShell>

@@ -7,7 +7,7 @@ import { RequesterDashboard } from '@/components/roles/RequesterDashboard';
 
 export default function RequesterPage() {
   return (
-    <ProtectedRoute allowedRoles={['REQUESTER', 'FACILITY_MANAGER', 'ADMIN']}>
+    <ProtectedRoute allowedRoles={['REQUESTER']}>
       <AppShell>
         <RequesterDashboard />
       </AppShell>

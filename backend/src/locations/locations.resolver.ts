@@ -19,6 +19,7 @@ export class LocationsResolver {
     name: 'locations',
     description: 'Retrieve all campus facilities, buildings, and rooms',
   })
+  @UseGuards(GqlAuthGuard)
   async getLocations(): Promise<Location[]> {
     return this.locationsService.findAll();
   }
@@ -27,6 +28,7 @@ export class LocationsResolver {
     name: 'location',
     description: 'Retrieve details of a specific campus location by ID',
   })
+  @UseGuards(GqlAuthGuard)
   async getLocation(@Args('id', { type: () => ID }) id: string): Promise<Location> {
     return this.locationsService.findById(id);
   }

@@ -1,23 +1,38 @@
 version: '3.8'
 
 services:
+  # Bundled database container (use `docker compose --profile bundled-db up` if needed).
+  # By default, FixFlow connects to the confirmed host PostgreSQL database on port 5432.
   postgres:
     image: postgres:16-alpine
     container_name: fixflow-postgres
     restart: always
+    profiles: ["bundled-db"]
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgrespassword
-      POSTGRES_DB: fixflow_db
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-}
+      POSTGRES_DB: ${POSTGRES_DB:-fixflow_db}
     ports:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres -d fixflow_db"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-fixflow_db}"]
       interval: 5s
       timeout: 5s
       retries: 5
+
+  mailpit:
+    image: axllent/mailpit:latest
+    container_name: fixflow-mailpit
+    restart: always
+    ports:
+      - "8025:8025" # Web UI
+      - "1025:1025" # SMTP server
+    environment:
+      MP_MAX_MESSAGES: 500
+      MP_SMTP_AUTH_ACCEPT_ANY: 1
+      MP_SMTP_AUTH_ALLOW_INSECURE: 1
 
   backend:
     build:
@@ -26,17 +41,35 @@ services:
     container_name: fixflow-backend
     restart: always
     environment:
-      DATABASE_URL: postgresql://postgres:postgrespassword@postgres:5432/fixflow_db?schema=public
-      JWT_SECRET: university-fixflow-super-secret-key-prod-grade
-      JWT_EXPIRES_IN: 7d
+      DATABASE_URL: ${DOCKER_DATABASE_URL:-${DATABASE_URL:?DATABASE_URL is required}}
+      JWT_SECRET: ${JWT_SECRET:?A JWT signing secret is required}
+      JWT_EXPIRES_IN: ${JWT_EXPIRES_IN:-7d}
       PORT: 4000
-      NODE_ENV: production
-      CORS_ORIGIN: http://localhost:3000
+      NODE_ENV: ${NODE_ENV:-development}
+      CORS_ORIGIN: ${CORS_ORIGIN:-http://localhost:3000}
+      SMTP_HOST: ${DOCKER_SMTP_HOST:-mailpit}
+      SMTP_PORT: ${SMTP_PORT:-1025}
+      SMTP_SECURE: ${SMTP_SECURE:-false}
+      SMTP_USER: ${SMTP_USER:-}
+      SMTP_PASS: ${SMTP_PASS:-}
+      SMTP_FROM: ${SMTP_FROM:-FixFlow Support <no-reply@fixflow.edu>}
+      FRONTEND_URL: ${FRONTEND_URL:-http://localhost:3000}
+      ATTACHMENTS_STORAGE_DRIVER: ${ATTACHMENTS_STORAGE_DRIVER:-local}
+      ATTACHMENTS_UPLOAD_DIR: ${ATTACHMENTS_UPLOAD_DIR:-/app/backend/uploads/attachments}
+      TRUST_PROXY: ${TRUST_PROXY:-false}
     ports:
       - "4000:4000"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    volumes:
+      - uploads_data:/app/backend/uploads
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:4000/api/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
     depends_on:
-      postgres:
-        condition: service_healthy
+      - mailpit
 
   frontend:
     build:
@@ -45,12 +78,14 @@ services:
     container_name: fixflow-frontend
     restart: always
     environment:
-      NEXT_PUBLIC_API_URL: http://localhost:4000/graphql
+      NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:4000/graphql}
       PORT: 3000
     ports:
       - "3000:3000"
     depends_on:
-      - backend
+      backend:
+        condition: service_healthy
 
 volumes:
   postgres_data:
+  uploads_data:

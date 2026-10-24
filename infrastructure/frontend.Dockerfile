@@ -2,11 +2,20 @@ FROM node:20-alpine AS builder
 
 WORKDIR /app
 
-COPY frontend/package*.json ./
-RUN npm ci
+# Copy monorepo manifests for workspace-aware installation
+COPY package.json package-lock.json ./
+COPY backend/package.json ./backend/
+COPY frontend/package.json ./frontend/
 
-COPY frontend/ ./
-RUN npm run build
+# Reproducible install for frontend dependencies
+RUN npm ci --workspace=frontend
+
+# Copy frontend source code and configs
+COPY frontend/ ./frontend/
+
+# Build Next.js application
+ENV NODE_ENV=production
+RUN npm run build --workspace=frontend
 
 FROM node:20-alpine AS runner
 
@@ -14,11 +23,25 @@ WORKDIR /app
 
 ENV NODE_ENV=production
 
-COPY --from=builder /app/package*.json ./
-COPY --from=builder /app/node_modules ./node_modules
-COPY --from=builder /app/.next ./.next
-COPY --from=builder /app/public ./public
+# Copy manifests and install production dependencies only
+COPY package.json package-lock.json ./
+COPY backend/package.json ./backend/
+COPY frontend/package.json ./frontend/
+
+RUN npm ci --workspace=frontend --omit=dev && npm cache clean --force
+
+# Copy Next.js build outputs
+COPY --chown=node:node --from=builder /app/frontend/.next ./frontend/.next
+COPY --chown=node:node --from=builder /app/frontend/package.json ./frontend/package.json
+COPY --chown=node:node frontend/public ./frontend/public
+
+# Set ownership to node user
+RUN chown -R node:node /app
+
+USER node
+
+WORKDIR /app/frontend
 
 EXPOSE 3000
 
-CMD ["npm", "run", "start"]
+CMD ["npx", "next", "start", "-p", "3000"]

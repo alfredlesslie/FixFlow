@@ -2,7 +2,8 @@
 
 import React, { useState, useEffect, Suspense } from 'react';
 import Link from 'next/link';
-import { useSearchParams } from 'next/navigation';
+import { useSearchParams, useRouter } from 'next/navigation';
+import { useAuth } from '@/lib/auth-context';
 import {
   Clock,
   ShieldCheck,
@@ -18,6 +19,7 @@ import {
   BadgeCheck,
   AlertCircle,
   Info,
+  LogOut,
 } from 'lucide-react';
 import { ThemeToggle } from '@/components/ui/ThemeToggle';
 
@@ -25,19 +27,25 @@ type ApprovalStatus = 'pending' | 'rejected';
 
 function PendingApprovalContent() {
   const searchParams = useSearchParams();
+  const router = useRouter();
+  const { user: authUser, logout } = useAuth();
 
-  const emailParam = searchParams.get('email') || 'tech.applicant@fixflow.edu';
-  const roleParam = searchParams.get('role') || 'TECHNICIAN';
-  const nameParam = searchParams.get('name') || 'Arun Nair';
-  const statusParam = (searchParams.get('status') as ApprovalStatus) || 'pending';
+  const emailParam = searchParams.get('email') || authUser?.email || 'tech.applicant@fixflow.edu';
+  const roleParam = searchParams.get('role') || authUser?.role || 'TECHNICIAN';
+  const nameParam = searchParams.get('name') || authUser?.name || 'Arun Nair';
+  const statusParam =
+    (searchParams.get('status') as ApprovalStatus) ||
+    (authUser?.status === 'REJECTED' ? 'rejected' : 'pending');
 
   const [status, setStatus] = useState<ApprovalStatus>(statusParam);
 
   useEffect(() => {
-    if (statusParam === 'rejected' || statusParam === 'pending') {
+    if (authUser?.status === 'REJECTED') {
+      setStatus('rejected');
+    } else if (statusParam === 'rejected' || statusParam === 'pending') {
       setStatus(statusParam);
     }
-  }, [statusParam]);
+  }, [statusParam, authUser]);
 
   // Read any last registration details stored in sessionStorage
   const [sessionRecord, setSessionRecord] = useState<any>(null);
@@ -49,12 +57,12 @@ function PendingApprovalContent() {
   }, []);
 
   const applicant = {
-    name: nameParam,
-    email: emailParam,
-    role: roleParam,
-    institutionalId: sessionRecord?.institutionalId || 'TECH-2026-0941',
-    department: sessionRecord?.department || 'Electrical & Automation Systems',
-    submittedAt: sessionRecord?.submittedAt || 'Today at 09:15 AM',
+    name: authUser?.name || nameParam,
+    email: authUser?.email || emailParam,
+    role: authUser?.role || roleParam,
+    institutionalId: authUser?.institutionalId || sessionRecord?.institutionalId || 'TECH-2026-0941',
+    department: authUser?.department || sessionRecord?.department || 'Electrical & Automation Systems',
+    submittedAt: sessionRecord?.submittedAt ? new Date(sessionRecord.submittedAt).toLocaleDateString() : 'Today at 09:15 AM',
     tradeDiscipline: sessionRecord?.tradeDiscipline || 'Electrical & Automation Systems',
     certificationNumber: sessionRecord?.certificationNumber || 'ELEC-CERT-9042-B',
     yearsExperience: sessionRecord?.yearsExperience || '4',
@@ -181,6 +189,19 @@ function PendingApprovalContent() {
                 >
                   Return to Sign In Portal
                 </Link>
+                {authUser && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      logout();
+                      router.push('/login');
+                    }}
+                    className="w-full sm:w-auto px-5 py-2.5 rounded-xl border border-rose-200 dark:border-rose-900 text-xs font-semibold text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition-colors text-center flex items-center justify-center gap-1.5"
+                  >
+                    <LogOut className="w-3.5 h-3.5" />
+                    <span>Sign Out</span>
+                  </button>
+                )}
                 <Link
                   href="/"
                   className="w-full sm:w-auto px-5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 text-xs font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors text-center"
@@ -240,52 +261,68 @@ function PendingApprovalContent() {
                   <RotateCcw className="w-3.5 h-3.5" />
                   <span>Submit Corrected Application</span>
                 </Link>
-                <Link
-                  href="/login"
-                  className="w-full sm:w-auto px-5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 text-xs font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors text-center"
-                >
-                  Return to Login
-                </Link>
+                {authUser ? (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      logout();
+                      router.push('/login');
+                    }}
+                    className="w-full sm:w-auto px-5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 text-xs font-semibold text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition-colors text-center flex items-center justify-center gap-1.5"
+                  >
+                    <LogOut className="w-3.5 h-3.5" />
+                    <span>Sign Out</span>
+                  </button>
+                ) : (
+                  <Link
+                    href="/login"
+                    className="w-full sm:w-auto px-5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 text-xs font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors text-center"
+                  >
+                    Return to Login
+                  </Link>
+                )}
               </div>
             </div>
           )}
 
-          {/* Development Prototype Switcher */}
-          <div className="pt-6 border-t border-slate-100 dark:border-slate-800/80">
-            <div className="flex items-center justify-between text-[11px] text-slate-400 mb-2">
-              <span className="font-semibold uppercase tracking-wider text-slate-500">
-                Development Preview States
-              </span>
-              <span>Toggle approval outcome</span>
+          {/* Development Prototype Switcher (Restricted to development/test environments only) */}
+          {(process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'test') && (
+            <div className="pt-6 border-t border-slate-100 dark:border-slate-800/80">
+              <div className="flex items-center justify-between text-[11px] text-slate-400 mb-2">
+                <span className="font-semibold uppercase tracking-wider text-slate-500">
+                  Development Preview States
+                </span>
+                <span>Toggle approval outcome</span>
+              </div>
+              <div className="grid grid-cols-2 gap-2">
+                <button
+                  type="button"
+                  onClick={() => setStatus('pending')}
+                  className={`py-1.5 px-3 rounded-lg text-[11px] font-medium border transition-colors ${
+                    status === 'pending'
+                      ? 'bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300 border-amber-400'
+                      : 'bg-slate-100/50 dark:bg-slate-950/50 border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400'
+                  }`}
+                >
+                  1. Pending Review State
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setStatus('rejected')}
+                  className={`py-1.5 px-3 rounded-lg text-[11px] font-medium border transition-colors ${
+                    status === 'rejected'
+                      ? 'bg-rose-100 text-rose-800 dark:bg-rose-950 dark:text-rose-300 border-rose-400'
+                      : 'bg-slate-100/50 dark:bg-slate-950/50 border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400'
+                  }`}
+                >
+                  2. Rejected with Reason & Reapplication
+                </button>
+              </div>
+              <p className="text-[10px] text-slate-400 mt-2 text-center">
+                Clear distinction: Prototype presentation state clearly identified. Restricted to development/test environments.
+              </p>
             </div>
-            <div className="grid grid-cols-2 gap-2">
-              <button
-                type="button"
-                onClick={() => setStatus('pending')}
-                className={`py-1.5 px-3 rounded-lg text-[11px] font-medium border transition-colors ${
-                  status === 'pending'
-                    ? 'bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300 border-amber-400'
-                    : 'bg-slate-100/50 dark:bg-slate-950/50 border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400'
-                }`}
-              >
-                1. Pending Review State
-              </button>
-              <button
-                type="button"
-                onClick={() => setStatus('rejected')}
-                className={`py-1.5 px-3 rounded-lg text-[11px] font-medium border transition-colors ${
-                  status === 'rejected'
-                    ? 'bg-rose-100 text-rose-800 dark:bg-rose-950 dark:text-rose-300 border-rose-400'
-                    : 'bg-slate-100/50 dark:bg-slate-950/50 border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400'
-                }`}
-              >
-                2. Rejected with Reason & Reapplication
-              </button>
-            </div>
-            <p className="text-[10px] text-slate-400 mt-2 text-center">
-              Clear distinction: Prototype presentation state clearly identified. No false claims of completed backend review.
-            </p>
-          </div>
+          )}
         </div>
       </main>
 

@@ -12,10 +12,19 @@ export class LocationsService {
     private readonly auditService: AuditService,
   ) {}
 
+  private mapLocation(loc: any): Location | null {
+    if (!loc) return null;
+    return {
+      ...loc,
+      room: loc.roomNumber,
+    };
+  }
+
   async findAll(): Promise<Location[]> {
-    return this.prisma.location.findMany({
+    const locations = await this.prisma.location.findMany({
       orderBy: [{ building: 'asc' }, { code: 'asc' }],
     });
+    return locations.map((loc) => this.mapLocation(loc)!);
   }
 
   async findById(id: string): Promise<Location> {
@@ -25,13 +34,14 @@ export class LocationsService {
     if (!location) {
       throw new NotFoundException(`Location with ID ${id} not found`);
     }
-    return location;
+    return this.mapLocation(location)!;
   }
 
   async findByCode(code: string): Promise<Location | null> {
-    return this.prisma.location.findUnique({
+    const location = await this.prisma.location.findUnique({
       where: { code },
     });
+    return this.mapLocation(location);
   }
 
   async createLocation(input: CreateLocationInput, actorId?: string): Promise<Location> {
@@ -57,7 +67,7 @@ export class LocationsService {
       name: location.name,
     });
 
-    return location;
+    return this.mapLocation(location)!;
   }
 
   async updateLocation(
@@ -82,6 +92,6 @@ export class LocationsService {
       code: updated.code,
     });
 
-    return updated;
+    return this.mapLocation(updated)!;
   }
 }

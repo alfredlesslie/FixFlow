@@ -6,6 +6,8 @@ import {
   Priority,
   RequestStatus,
   WorkOrderStatus,
+  AccountStatus,
+  ApplicationStatus,
 } from '@prisma/client';
 
 export enum ScheduleStatus {
@@ -22,11 +24,23 @@ export {
   Priority,
   RequestStatus,
   WorkOrderStatus,
+  AccountStatus,
+  ApplicationStatus,
 };
 
 registerEnumType(Role, {
   name: 'Role',
   description: 'User access control roles in FixFlow',
+});
+
+registerEnumType(AccountStatus, {
+  name: 'AccountStatus',
+  description: 'Lifecycle state of an institutional account in FixFlow',
+});
+
+registerEnumType(ApplicationStatus, {
+  name: 'ApplicationStatus',
+  description: 'Review status of an institutional role application',
 });
 
 registerEnumType(AssetStatus, {

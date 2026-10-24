@@ -41,7 +41,9 @@ export default function RegisterPage() {
 
       {/* Main Registration Content */}
       <main className="max-w-4xl w-full mx-auto relative z-10 flex-1 flex items-center justify-center">
-        <RegisterForm />
+        <React.Suspense fallback={<div className="p-8 text-center text-xs text-slate-400">Loading enrollment station...</div>}>
+          <RegisterForm />
+        </React.Suspense>
       </main>
 
       {/* Footer */}

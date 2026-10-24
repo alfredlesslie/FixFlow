@@ -1,6 +1,7 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
+import { gql, useQuery, useMutation } from '@apollo/client';
 import {
   UserCheck,
   Shield,
@@ -22,6 +23,9 @@ import {
   Info,
   BadgeCheck,
   RotateCcw,
+  Loader2,
+  RefreshCw,
+  ShieldAlert,
 } from 'lucide-react';
 import { RegistrationApplication, ApplicationStatus } from '@/lib/types';
 import { Badge } from '@/components/ui/Badge';
@@ -29,106 +33,136 @@ import { Button } from '@/components/ui/Button';
 import { Modal } from '@/components/ui/Modal';
 import { useAuth } from '@/lib/auth-context';
 
-export const INITIAL_APPLICATIONS: RegistrationApplication[] = [
-  {
-    id: 'app-2026-001',
-    applicantName: 'Vikram Joshi',
-    applicantEmail: 'v.joshi@fixflow.edu',
-    institutionalId: 'TECH-2026-0814',
-    department: 'Central Facilities Operations',
-    contactNumber: '+1 (555) 392-1849',
-    requestedRole: 'TECHNICIAN',
-    emailVerified: true,
-    status: 'PENDING_REVIEW',
-    tradeDiscipline: 'HVAC & Climate Control',
-    certificationNumber: 'EPA-UNIVERSAL-49201',
-    yearsExperience: '6-10',
-    facilityScope: 'Central Academic Campus (All Buildings)',
-    submittedAt: '2026-10-14T08:30:00Z',
-  },
-  {
-    id: 'app-2026-002',
-    applicantName: 'Dr. Anita Desai',
-    applicantEmail: 'a.desai@fixflow.edu',
-    institutionalId: 'FAC-2024-9104',
-    department: 'Electrical & Automation Systems',
-    contactNumber: '+1 (555) 781-4492',
-    requestedRole: 'FACILITY_MANAGER',
-    emailVerified: true,
-    status: 'PENDING_REVIEW',
-    facilityScope: 'Engineering & Science Complex',
-    appointmentJustification:
-      'Appointed Faculty Operations Co-Chair for the New Technology Wing. Requires ticket triage and specialist dispatch privileges.',
-    submittedAt: '2026-10-13T14:45:00Z',
-  },
-  {
-    id: 'app-2026-003',
-    applicantName: 'Carlos Morales',
-    applicantEmail: 'c.morales@fixflow.edu',
-    institutionalId: 'TECH-2026-0922',
-    department: 'Central Facilities Operations',
-    contactNumber: '+1 (555) 619-2044',
-    requestedRole: 'TECHNICIAN',
-    emailVerified: false,
-    status: 'PENDING_REVIEW',
-    tradeDiscipline: 'Plumbing & Hydraulics',
-    certificationNumber: 'PLUMB-MSTR-88210',
-    yearsExperience: '3-5',
-    submittedAt: '2026-10-14T10:15:00Z',
-  },
-  {
-    id: 'app-2026-004',
-    applicantName: 'Preeti Sengupta',
-    applicantEmail: 'p.sengupta@fixflow.edu',
-    institutionalId: 'FAC-2025-0129',
-    department: 'Library & Information Services',
-    contactNumber: '+1 (555) 440-1928',
-    requestedRole: 'FACILITY_MANAGER',
-    emailVerified: true,
-    status: 'REJECTED',
-    facilityScope: 'Central Academic Campus (All Buildings)',
-    appointmentJustification: 'Staff librarian requesting building oversight permissions.',
-    rejectionReason:
-      'Facility manager authorization requires written sign-off from the University Facilities Director. Please attach appointment letter ref.',
-    reviewedBy: 'Vikram Singhania (Admin)',
-    reviewedAt: '2026-10-12T16:00:00Z',
-    submittedAt: '2026-10-11T11:20:00Z',
-  },
-];
+export const GET_REGISTRATION_APPLICATIONS_QUERY = gql`
+  query GetRegistrationApplications($status: ApplicationStatus) {
+    registrationApplications(status: $status) {
+      id
+      userId
+      applicantName
+      applicantEmail
+      institutionalId
+      department
+      contactNumber
+      requestedRole
+      status
+      emailVerified
+      tradeDiscipline
+      certificationNumber
+      yearsExperience
+      facilityScope
+      appointmentJustification
+      rejectionReason
+      reviewedById
+      reviewedAt
+      submittedAt
+      createdAt
+      updatedAt
+    }
+  }
+`;
+
+export const GET_REGISTRATION_APPLICATION_QUERY = gql`
+  query GetRegistrationApplication($id: ID!) {
+    registrationApplication(id: $id) {
+      id
+      userId
+      applicantName
+      applicantEmail
+      institutionalId
+      department
+      contactNumber
+      requestedRole
+      status
+      emailVerified
+      tradeDiscipline
+      certificationNumber
+      yearsExperience
+      facilityScope
+      appointmentJustification
+      rejectionReason
+      reviewedById
+      reviewedAt
+      submittedAt
+      createdAt
+      updatedAt
+    }
+  }
+`;
+
+export const APPROVE_REGISTRATION_APPLICATION_MUTATION = gql`
+  mutation ApproveRegistrationApplication($id: ID!) {
+    approveRegistrationApplication(id: $id) {
+      id
+      userId
+      applicantName
+      applicantEmail
+      institutionalId
+      department
+      contactNumber
+      requestedRole
+      status
+      emailVerified
+      tradeDiscipline
+      certificationNumber
+      yearsExperience
+      facilityScope
+      appointmentJustification
+      rejectionReason
+      reviewedById
+      reviewedAt
+      submittedAt
+      createdAt
+      updatedAt
+    }
+  }
+`;
+
+export const REJECT_REGISTRATION_APPLICATION_MUTATION = gql`
+  mutation RejectRegistrationApplication($id: ID!, $reason: String!) {
+    rejectRegistrationApplication(id: $id, reason: $reason) {
+      id
+      userId
+      applicantName
+      applicantEmail
+      institutionalId
+      department
+      contactNumber
+      requestedRole
+      status
+      emailVerified
+      tradeDiscipline
+      certificationNumber
+      yearsExperience
+      facilityScope
+      appointmentJustification
+      rejectionReason
+      reviewedById
+      reviewedAt
+      submittedAt
+      createdAt
+      updatedAt
+    }
+  }
+`;
+
+function formatErrorMessage(err: any): string {
+  if (err?.graphQLErrors && err.graphQLErrors.length > 0) {
+    const first = err.graphQLErrors[0];
+    if (Array.isArray(first.message)) return first.message.join('. ');
+    if (first.message) return first.message;
+  }
+  if (
+    err?.message?.includes('Failed to fetch') ||
+    err?.message?.includes('NetworkError') ||
+    err?.networkError
+  ) {
+    return 'Unable to reach FixFlow backend service. Please ensure the backend server is running.';
+  }
+  return err?.message || 'An unexpected error occurred during this operation.';
+}
 
 export function AdminApprovalsReview() {
   const { user: authUser } = useAuth();
-
-  const [applications, setApplications] = useState<RegistrationApplication[]>(() => {
-    // Check if a registration was just submitted during this session
-    try {
-      const saved = sessionStorage.getItem('fixflow_last_registration');
-      if (saved) {
-        const parsed = JSON.parse(saved);
-        if (parsed.requestedRole !== 'REQUESTER') {
-          const newApp: RegistrationApplication = {
-            id: `app-live-${Date.now()}`,
-            applicantName: `${parsed.firstName} ${parsed.lastName}`,
-            applicantEmail: parsed.institutionalEmail,
-            institutionalId: parsed.institutionalId,
-            department: parsed.department,
-            contactNumber: parsed.contactNumber,
-            requestedRole: parsed.requestedRole,
-            emailVerified: true,
-            status: 'PENDING_REVIEW',
-            tradeDiscipline: parsed.tradeDiscipline,
-            certificationNumber: parsed.certificationNumber,
-            yearsExperience: parsed.yearsExperience,
-            facilityScope: parsed.facilityScope,
-            appointmentJustification: parsed.appointmentJustification,
-            submittedAt: parsed.submittedAt || new Date().toISOString(),
-          };
-          return [newApp, ...INITIAL_APPLICATIONS];
-        }
-      }
-    } catch {}
-    return INITIAL_APPLICATIONS;
-  });
 
   const [statusFilter, setStatusFilter] = useState<'ALL' | ApplicationStatus>('ALL');
   const [roleFilter, setRoleFilter] = useState<'ALL' | 'TECHNICIAN' | 'FACILITY_MANAGER'>('ALL');
@@ -144,6 +178,26 @@ export function AdminApprovalsReview() {
     message: string;
   } | null>(null);
 
+  const [activeActionId, setActiveActionId] = useState<string | null>(null);
+
+  // Real backend GraphQL queries & mutations
+  const { data, loading, error, refetch } = useQuery(GET_REGISTRATION_APPLICATIONS_QUERY, {
+    variables: {
+      status: statusFilter === 'ALL' ? undefined : statusFilter,
+    },
+    fetchPolicy: 'network-only',
+    notifyOnNetworkStatusChange: true,
+  });
+
+  const [approveMutation, { loading: isApproving }] = useMutation(
+    APPROVE_REGISTRATION_APPLICATION_MUTATION
+  );
+  const [rejectMutation, { loading: isRejecting }] = useMutation(
+    REJECT_REGISTRATION_APPLICATION_MUTATION
+  );
+
+  const applications: RegistrationApplication[] = data?.registrationApplications || [];
+
   // Quick reject reason presets
   const REJECT_PRESETS = [
     'Unverified or unlisted trade certification credentials.',
@@ -152,56 +206,105 @@ export function AdminApprovalsReview() {
     'Applicant already has an active account; request role change through department head.',
   ];
 
-  const handleApprove = () => {
+  const handleApprove = async () => {
     if (!selectedApp) return;
 
-    setApplications((prev) =>
-      prev.map((app) =>
-        app.id === selectedApp.id
-          ? {
-              ...app,
-              status: 'APPROVED' as ApplicationStatus,
-              reviewedBy: authUser?.name || 'Administrator',
-              reviewedAt: new Date().toISOString(),
-            }
-          : app
-      )
-    );
+    // Client-side self-approval guard (mirrors backend rule)
+    if (selectedApp.userId && authUser && selectedApp.userId === authUser.id) {
+      setActionAlert({
+        type: 'error',
+        message: 'Self-approval prohibited: Administrators cannot approve their own registration application.',
+      });
+      setIsApproveOpen(false);
+      return;
+    }
 
-    setActionAlert({
-      type: 'success',
-      message: `Application for ${selectedApp.applicantName} approved. Assigned role: ${selectedApp.requestedRole.replace('_', ' ')}.`,
-    });
+    // Client-side email verification guard (mirrors backend rule)
+    if (!selectedApp.emailVerified) {
+      setActionAlert({
+        type: 'error',
+        message: 'Cannot approve staff application: Applicant institutional email address has not been verified.',
+      });
+      setIsApproveOpen(false);
+      return;
+    }
 
-    setIsApproveOpen(false);
-    setSelectedApp(null);
+    setActiveActionId(selectedApp.id);
+    setActionAlert(null);
+
+    try {
+      const res = await approveMutation({
+        variables: { id: selectedApp.id },
+      });
+
+      const updated = res.data?.approveRegistrationApplication;
+      setActionAlert({
+        type: 'success',
+        message: `Application for ${updated?.applicantName || selectedApp.applicantName} approved successfully. Assigned role: ${(updated?.requestedRole || selectedApp.requestedRole).replace('_', ' ')}.`,
+      });
+
+      setIsApproveOpen(false);
+      setSelectedApp(null);
+      await refetch();
+    } catch (err: any) {
+      setActionAlert({
+        type: 'error',
+        message: formatErrorMessage(err),
+      });
+    } finally {
+      setActiveActionId(null);
+    }
   };
 
-  const handleReject = () => {
+  const handleReject = async () => {
     if (!selectedApp || !rejectionReason.trim()) return;
 
-    setApplications((prev) =>
-      prev.map((app) =>
-        app.id === selectedApp.id
-          ? {
-              ...app,
-              status: 'REJECTED' as ApplicationStatus,
-              rejectionReason: rejectionReason.trim(),
-              reviewedBy: authUser?.name || 'Administrator',
-              reviewedAt: new Date().toISOString(),
-            }
-          : app
-      )
-    );
+    if (rejectionReason.trim().length < 10) {
+      setActionAlert({
+        type: 'error',
+        message: 'A documented rejection reason of at least 10 characters is required.',
+      });
+      return;
+    }
 
-    setActionAlert({
-      type: 'success',
-      message: `Application for ${selectedApp.applicantName} was rejected with recorded justification.`,
-    });
+    if (selectedApp.userId && authUser && selectedApp.userId === authUser.id) {
+      setActionAlert({
+        type: 'error',
+        message: 'Prohibited: You cannot reject your own registration application.',
+      });
+      setIsRejectOpen(false);
+      return;
+    }
 
-    setIsRejectOpen(false);
-    setSelectedApp(null);
-    setRejectionReason('');
+    setActiveActionId(selectedApp.id);
+    setActionAlert(null);
+
+    try {
+      const res = await rejectMutation({
+        variables: {
+          id: selectedApp.id,
+          reason: rejectionReason.trim(),
+        },
+      });
+
+      const updated = res.data?.rejectRegistrationApplication;
+      setActionAlert({
+        type: 'success',
+        message: `Application for ${updated?.applicantName || selectedApp.applicantName} was rejected with recorded justification.`,
+      });
+
+      setIsRejectOpen(false);
+      setSelectedApp(null);
+      setRejectionReason('');
+      await refetch();
+    } catch (err: any) {
+      setActionAlert({
+        type: 'error',
+        message: formatErrorMessage(err),
+      });
+    } finally {
+      setActiveActionId(null);
+    }
   };
 
   // Filtered applications
@@ -224,18 +327,44 @@ export function AdminApprovalsReview() {
   const approvedCount = applications.filter((a) => a.status === 'APPROVED').length;
   const rejectedCount = applications.filter((a) => a.status === 'REJECTED').length;
 
+  if (authUser && authUser.role !== 'ADMIN') {
+    return (
+      <div className="p-8 rounded-2xl bg-white dark:bg-slate-900 border border-rose-200 dark:border-rose-900/60 shadow-sm text-center space-y-3">
+        <ShieldAlert className="w-10 h-10 text-rose-500 mx-auto" />
+        <h3 className="text-base font-bold text-slate-900 dark:text-white">Administrator Access Required</h3>
+        <p className="text-xs text-slate-500 max-w-md mx-auto">
+          The registration approvals workstation is restricted to verified administrators. Your current role is <strong className="font-mono text-slate-700 dark:text-slate-300">[{authUser.role}]</strong>.
+        </p>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6">
       {/* Action Notification Alert */}
       {actionAlert && (
-        <div className="p-4 rounded-2xl bg-emerald-50 dark:bg-emerald-950/50 border border-emerald-200 dark:border-emerald-800 text-emerald-800 dark:text-emerald-300 text-xs flex items-center justify-between gap-3 animate-fadeIn">
+        <div
+          className={`p-4 rounded-2xl text-xs flex items-center justify-between gap-3 animate-fadeIn ${
+            actionAlert.type === 'error'
+              ? 'bg-rose-50 dark:bg-rose-950/50 border border-rose-200 dark:border-rose-800 text-rose-800 dark:text-rose-300'
+              : 'bg-emerald-50 dark:bg-emerald-950/50 border border-emerald-200 dark:border-emerald-800 text-emerald-800 dark:text-emerald-300'
+          }`}
+        >
           <div className="flex items-center gap-2">
-            <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
+            {actionAlert.type === 'error' ? (
+              <AlertCircle className="w-4 h-4 text-rose-500 shrink-0" />
+            ) : (
+              <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
+            )}
             <span>{actionAlert.message}</span>
           </div>
           <button
             onClick={() => setActionAlert(null)}
-            className="text-[11px] font-semibold text-emerald-700 dark:text-emerald-400 hover:underline"
+            className={`text-[11px] font-semibold hover:underline ${
+              actionAlert.type === 'error'
+                ? 'text-rose-700 dark:text-rose-400'
+                : 'text-emerald-700 dark:text-emerald-400'
+            }`}
           >
             Dismiss
           </button>
@@ -352,20 +481,55 @@ export function AdminApprovalsReview() {
             <option value="TECHNICIAN">Technicians Only</option>
             <option value="FACILITY_MANAGER">Facility Managers Only</option>
           </select>
+
+          {/* Refresh Action */}
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={() => refetch()}
+            disabled={loading}
+            className="px-3 py-1.5 text-xs rounded-xl flex items-center gap-1.5"
+            title="Refresh applications from server"
+          >
+            <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />
+            <span>Refresh</span>
+          </Button>
         </div>
       </div>
 
-      {/* Integration Boundary Notice */}
-      <div className="p-3.5 rounded-xl bg-slate-100 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 text-xs text-slate-600 dark:text-slate-400 flex items-start gap-2.5">
-        <Info className="w-4 h-4 text-sky-500 shrink-0 mt-0.5" />
-        <div className="text-[11px] leading-relaxed">
-          <strong>Frontend Integration Boundary:</strong> Only signed-in Administrators can view and execute these approval actions. Approval mutations update client session state and dispatch records to the local audit trail pending final backend GraphQL endpoint connection.
+      {/* Backend Error Alert & Retry */}
+      {error && (
+        <div className="p-4 rounded-2xl bg-rose-50 dark:bg-rose-950/50 border border-rose-200 dark:border-rose-900/60 text-rose-800 dark:text-rose-300 text-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div className="flex items-center gap-2.5">
+            <AlertCircle className="w-4 h-4 text-rose-500 shrink-0" />
+            <div>
+              <strong className="block font-semibold">Failed to load registration applications</strong>
+              <span className="text-[11px] text-rose-700 dark:text-rose-400">
+                {formatErrorMessage(error)}
+              </span>
+            </div>
+          </div>
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={() => refetch()}
+            className="border-rose-300 dark:border-rose-800 text-rose-700 dark:text-rose-300 hover:bg-rose-100 dark:hover:bg-rose-900/50 self-start sm:self-auto shrink-0"
+          >
+            <RefreshCw className="w-3.5 h-3.5 mr-1" />
+            Retry Request
+          </Button>
         </div>
-      </div>
+      )}
 
       {/* Applications Table / Cards */}
       <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-sm overflow-hidden">
-        {filteredApps.length === 0 ? (
+        {loading && applications.length === 0 ? (
+          <div className="p-16 text-center text-xs text-slate-400 space-y-3">
+            <Loader2 className="w-8 h-8 mx-auto text-sky-500 animate-spin" />
+            <p className="font-semibold text-slate-700 dark:text-slate-300">Retrieving registration applications...</p>
+            <p className="text-[11px] text-slate-500">Connecting to FixFlow GraphQL administrator service.</p>
+          </div>
+        ) : filteredApps.length === 0 ? (
           <div className="p-12 text-center text-xs text-slate-400 space-y-2">
             <UserCheck className="w-8 h-8 mx-auto text-slate-300 dark:text-slate-600" />
             <p className="font-semibold text-slate-600 dark:text-slate-300">No applications match current filters.</p>
@@ -465,38 +629,69 @@ export function AdminApprovalsReview() {
                         <Button
                           size="sm"
                           variant="outline"
+                          disabled={activeActionId === app.id || isApproving || isRejecting}
                           onClick={() => {
                             setSelectedApp(app);
                             setIsRejectOpen(true);
                           }}
                           className="border-rose-200 dark:border-rose-900 text-rose-700 dark:text-rose-300 hover:bg-rose-50 dark:hover:bg-rose-950/50"
                         >
-                          <XCircle className="w-3.5 h-3.5 mr-1" />
+                          {activeActionId === app.id && isRejecting ? (
+                            <Loader2 className="w-3.5 h-3.5 mr-1 animate-spin" />
+                          ) : (
+                            <XCircle className="w-3.5 h-3.5 mr-1" />
+                          )}
                           Reject
                         </Button>
 
                         <Button
                           size="sm"
                           variant="primary"
+                          disabled={
+                            activeActionId === app.id ||
+                            isApproving ||
+                            isRejecting ||
+                            (!!app.userId && !!authUser && app.userId === authUser.id) ||
+                            !app.emailVerified
+                          }
                           onClick={() => {
                             setSelectedApp(app);
                             setIsApproveOpen(true);
                           }}
-                          className="bg-emerald-600 hover:bg-emerald-500 text-white shadow-sm"
+                          title={
+                            app.userId && authUser && app.userId === authUser.id
+                              ? 'Self-approval is prohibited'
+                              : !app.emailVerified
+                              ? 'Applicant email verification required'
+                              : 'Authorize account'
+                          }
+                          className="bg-emerald-600 hover:bg-emerald-500 text-white shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
                         >
-                          <CheckCircle2 className="w-3.5 h-3.5 mr-1" />
+                          {activeActionId === app.id && isApproving ? (
+                            <Loader2 className="w-3.5 h-3.5 mr-1 animate-spin" />
+                          ) : (
+                            <CheckCircle2 className="w-3.5 h-3.5 mr-1" />
+                          )}
                           Approve Account
                         </Button>
                       </>
                     ) : app.status === 'APPROVED' ? (
                       <div className="text-[11px] text-emerald-600 dark:text-emerald-400 font-semibold flex items-center gap-1">
                         <CheckCircle2 className="w-4 h-4" />
-                        <span>Authorized by {app.reviewedBy}</span>
+                        <span>
+                          Authorized
+                          {app.reviewedById ? ` by admin (${app.reviewedById.substring(0, 8)})` : ''}
+                          {app.reviewedAt ? ` on ${new Date(app.reviewedAt).toLocaleDateString()}` : ''}
+                        </span>
                       </div>
                     ) : (
                       <div className="text-[11px] text-rose-600 dark:text-rose-400 font-semibold flex items-center gap-1">
                         <XCircle className="w-4 h-4" />
-                        <span>Denied by {app.reviewedBy}</span>
+                        <span>
+                          Denied
+                          {app.reviewedById ? ` by admin (${app.reviewedById.substring(0, 8)})` : ''}
+                          {app.reviewedAt ? ` on ${new Date(app.reviewedAt).toLocaleDateString()}` : ''}
+                        </span>
                       </div>
                     )}
                   </div>
@@ -579,10 +774,22 @@ export function AdminApprovalsReview() {
             <Button
               variant="primary"
               size="sm"
+              disabled={
+                isApproving ||
+                (!!selectedApp?.userId && !!authUser && selectedApp.userId === authUser.id) ||
+                !selectedApp?.emailVerified
+              }
               onClick={handleApprove}
-              className="bg-emerald-600 hover:bg-emerald-500 text-white"
+              className="bg-emerald-600 hover:bg-emerald-500 text-white disabled:opacity-50"
             >
-              Confirm & Authorize Account
+              {isApproving ? (
+                <>
+                  <Loader2 className="w-3.5 h-3.5 mr-1.5 animate-spin" />
+                  Authorizing...
+                </>
+              ) : (
+                'Confirm & Authorize Account'
+              )}
             </Button>
           </>
         }
@@ -610,17 +817,26 @@ export function AdminApprovalsReview() {
               </div>
             </div>
 
+            {selectedApp.userId && authUser && selectedApp.userId === authUser.id && (
+              <div className="p-3 rounded-xl bg-rose-50 dark:bg-rose-950/50 border border-rose-200 dark:border-rose-900/80 text-rose-800 dark:text-rose-300 text-[11px] flex items-start gap-2">
+                <AlertCircle className="w-4 h-4 text-rose-500 shrink-0 mt-0.5" />
+                <span>
+                  <strong>Self-Approval Prohibited:</strong> You cannot approve your own registration application under institutional audit policy.
+                </span>
+              </div>
+            )}
+
             {!selectedApp.emailVerified && (
               <div className="p-3 rounded-xl bg-amber-50 dark:bg-amber-950/50 border border-amber-200 dark:border-amber-800/80 text-amber-800 dark:text-amber-300 text-[11px] flex items-start gap-2">
                 <AlertTriangle className="w-4 h-4 text-amber-500 shrink-0 mt-0.5" />
                 <span>
-                  Notice: This applicant has not yet completed institutional email verification. Approving now will grant role permissions once email verification succeeds.
+                  <strong>Email Verification Required:</strong> This applicant has not yet completed institutional email verification. The backend requires email verification before an application can be approved.
                 </span>
               </div>
             )}
 
             <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-relaxed">
-              By authorizing, this user will gain access to campus work orders, equipment triage, and operational tools corresponding to the requested role. An immutable governance log will be created.
+              By authorizing, this user will gain access to campus work orders, equipment triage, and operational tools corresponding to the requested role. An immutable governance audit entry will be recorded.
             </p>
           </div>
         )}
@@ -652,10 +868,21 @@ export function AdminApprovalsReview() {
             <Button
               variant="danger"
               size="sm"
-              disabled={rejectionReason.trim().length < 10}
+              disabled={
+                isRejecting ||
+                rejectionReason.trim().length < 10 ||
+                (!!selectedApp?.userId && !!authUser && selectedApp.userId === authUser.id)
+              }
               onClick={handleReject}
             >
-              Confirm Denial
+              {isRejecting ? (
+                <>
+                  <Loader2 className="w-3.5 h-3.5 mr-1.5 animate-spin" />
+                  Denying...
+                </>
+              ) : (
+                'Confirm Denial'
+              )}
             </Button>
           </>
         }
@@ -667,6 +894,15 @@ export function AdminApprovalsReview() {
               <strong className="text-slate-900 dark:text-white">{selectedApp.applicantName}</strong> (
               {selectedApp.requestedRole.replace('_', ' ')}). The applicant will see this explanation and will have an option to submit a corrected application.
             </p>
+
+            {selectedApp.userId && authUser && selectedApp.userId === authUser.id && (
+              <div className="p-3 rounded-xl bg-rose-50 dark:bg-rose-950/50 border border-rose-200 dark:border-rose-900/80 text-rose-800 dark:text-rose-300 text-[11px] flex items-start gap-2">
+                <AlertCircle className="w-4 h-4 text-rose-500 shrink-0 mt-0.5" />
+                <span>
+                  <strong>Prohibited:</strong> You cannot reject your own registration application.
+                </span>
+              </div>
+            )}
 
             <div>
               <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">

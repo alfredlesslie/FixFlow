@@ -1,1 +1,0 @@
-C:/projects/FixFlow/node_modules/@embedded-postgres/windows-x64/native/bin/postgres.exe "-D" "C:\projects\FixFlow\backend\.postgres-data" "-p" "5433"

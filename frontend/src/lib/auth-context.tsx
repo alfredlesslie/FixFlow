@@ -1,84 +1,70 @@
 'use client';
 
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import { gql, useMutation, useQuery } from '@apollo/client';
+import { gql, useMutation } from '@apollo/client';
+import { apolloClient } from './apollo-client';
+import { UserRole, AccountStatus } from './types';
 
 export interface AuthUser {
   id: string;
   email: string;
   name: string;
-  role: 'REQUESTER' | 'TECHNICIAN' | 'FACILITY_MANAGER' | 'ADMIN';
+  firstName?: string;
+  lastName?: string;
+  role: UserRole;
+  status: AccountStatus;
+  emailVerified: boolean;
   department?: string;
+  phone?: string;
+  institutionalId?: string;
 }
-
-export const INSTITUTIONAL_SEED_ACCOUNTS: (AuthUser & { defaultPassword: string })[] = [
-  {
-    id: 'usr-admin-1',
-    email: 'admin@fixflow.edu',
-    name: 'Vikram Singhania',
-    role: 'ADMIN',
-    department: 'Campus Administration',
-    defaultPassword: 'Admin@123',
-  },
-  {
-    id: 'usr-fm-1',
-    email: 'manager@fixflow.edu',
-    name: 'Sunil Mehta',
-    role: 'FACILITY_MANAGER',
-    department: 'Central Facilities Operations',
-    defaultPassword: 'Manager@123',
-  },
-  {
-    id: 'usr-tech-1',
-    email: 'tech.rahul@fixflow.edu',
-    name: 'Rahul Verma',
-    role: 'TECHNICIAN',
-    department: 'Electrical & Automation Systems',
-    defaultPassword: 'Tech@123',
-  },
-  {
-    id: 'usr-req-1',
-    email: 'student.riya@fixflow.edu',
-    name: 'Riya Sharma',
-    role: 'REQUESTER',
-    department: 'Computer Science & Engineering',
-    defaultPassword: 'Student@123',
-  },
-];
 
 interface AuthContextType {
   user: AuthUser | null;
   token: string | null;
   login: (email: string, pass: string) => Promise<AuthUser>;
-  logout: () => void;
+  logout: () => Promise<void>;
   isLoading: boolean;
   loading: boolean;
   isAuthenticated: boolean;
+  refreshUser: () => Promise<AuthUser | null>;
 }
 
-const LOGIN_MUTATION = gql`
+export const LOGIN_MUTATION = gql`
   mutation Login($input: LoginInput!) {
     login(input: $input) {
       accessToken
       user {
         id
         email
+        firstName
+        lastName
         name
         role
+        status
+        emailVerified
         department
+        phone
+        institutionalId
       }
     }
   }
 `;
 
-const ME_QUERY = gql`
+export const ME_QUERY = gql`
   query Me {
     me {
       id
       email
+      firstName
+      lastName
       name
       role
+      status
+      emailVerified
       department
+      phone
+      institutionalId
     }
   }
 `;
@@ -89,10 +75,11 @@ const AuthContext = createContext<AuthContextType>({
   login: async () => {
     throw new Error('AuthProvider not initialized');
   },
-  logout: () => {},
+  logout: async () => {},
   isLoading: true,
   loading: true,
   isAuthenticated: false,
+  refreshUser: async () => null,
 });
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
@@ -101,87 +88,328 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [isLoading, setIsLoading] = useState(true);
 
   const [executeLogin] = useMutation(LOGIN_MUTATION);
-  const { data: meData } = useQuery(ME_QUERY, {
-    skip: !token || token.startsWith('mock-token-'),
-    errorPolicy: 'ignore',
-  });
 
-  useEffect(() => {
-    const storedToken = localStorage.getItem('fixflow_token');
-    const storedUser = localStorage.getItem('fixflow_user');
-    if (storedToken) {
-      setToken(storedToken);
-      if (storedUser) {
-        try {
-          setUser(JSON.parse(storedUser));
-        } catch {}
+  // Authoritatively fetch and verify current user identity from backend via ME_QUERY
+  const resolveCurrentUser = React.useCallback(
+    async (activeToken?: string | null): Promise<AuthUser | null> => {
+      const tokenToUse =
+        activeToken ??
+        (typeof window !== 'undefined' ? localStorage.getItem('fixflow_token') : null);
+
+      if (!tokenToUse) {
+        return null;
       }
+
+      try {
+        const res = await apolloClient.query<{ me: AuthUser }>({
+          query: ME_QUERY,
+          fetchPolicy: 'network-only',
+          context: {
+            headers: {
+              authorization: `Bearer ${tokenToUse}`,
+            },
+          },
+        });
+
+        const meUser = res.data?.me;
+        if (meUser) {
+          if (
+            meUser.status &&
+            meUser.status !== 'ACTIVE' &&
+            meUser.status !== 'REJECTED'
+          ) {
+            return null;
+          }
+          return meUser;
+        }
+        return null;
+      } catch (err: any) {
+        const isAuthError =
+          err?.graphQLErrors?.some((e: any) => {
+            const code = e.extensions?.code;
+            const msg = e.message?.toLowerCase() || '';
+            return (
+              code === 'UNAUTHENTICATED' ||
+              code === 'FORBIDDEN' ||
+              msg.includes('unauthorized') ||
+              msg.includes('session') ||
+              msg.includes('revoked') ||
+              msg.includes('expired') ||
+              msg.includes('not currently in an authorized status')
+            );
+          }) || false;
+
+        if (isAuthError) {
+          throw new Error('UNAUTHENTICATED_SESSION');
+        }
+        throw err;
+      }
+    },
+    [],
+  );
+
+  const logout = React.useCallback(async () => {
+    setIsLoading(true);
+    try {
+      if (typeof window !== 'undefined') {
+        localStorage.removeItem('fixflow_token');
+        localStorage.removeItem('fixflow_user');
+      }
+      setToken(null);
+      setUser(null);
+      try {
+        await apolloClient.clearStore();
+      } catch (e) {
+        console.warn('Apollo clearStore on logout error:', e);
+      }
+    } finally {
+      setIsLoading(false);
     }
-    setIsLoading(false);
   }, []);
 
-  useEffect(() => {
-    if (meData?.me) {
-      setUser(meData.me);
-      localStorage.setItem('fixflow_user', JSON.stringify(meData.me));
-    }
-  }, [meData]);
+  const login = React.useCallback(
+    async (email: string, pass: string): Promise<AuthUser> => {
+      setIsLoading(true);
+      const cleanEmail = email.trim().toLowerCase();
+      const cleanPass = pass.trim();
 
-  const login = async (email: string, pass: string): Promise<AuthUser> => {
-    const cleanEmail = email.trim().toLowerCase();
-    const cleanPass = pass.trim();
+      try {
+        // Step 1: Invalidate previous session and clear store prior to new authentication
+        if (typeof window !== 'undefined') {
+          localStorage.removeItem('fixflow_token');
+          localStorage.removeItem('fixflow_user');
+        }
+        setToken(null);
+        setUser(null);
+        try {
+          await apolloClient.clearStore();
+        } catch (e) {
+          console.warn('Apollo clearStore on login pre-clean error:', e);
+        }
 
-    // 1. Try GraphQL Backend Login
-    try {
-      const res = await executeLogin({
-        variables: {
-          input: { email: cleanEmail, password: cleanPass },
-        },
-      });
+        // Step 2: Execute login mutation
+        const res = await executeLogin({
+          variables: {
+            input: { email: cleanEmail, password: cleanPass },
+          },
+        });
 
-      const authData = res.data?.login;
-      if (authData && authData.user) {
+        const authData = res.data?.login;
+        if (!authData?.user || !authData?.accessToken) {
+          throw new Error('Authentication response was incomplete. Please try again.');
+        }
+
+        const loggedUser: AuthUser = authData.user;
+        if (
+          loggedUser.status &&
+          loggedUser.status !== 'ACTIVE' &&
+          loggedUser.status !== 'REJECTED'
+        ) {
+          await logout();
+          throw new Error('Account is not currently in an authorized active state.');
+        }
+
+        // Step 3: Persist token to storage and state immediately so any query uses new identity
+        if (typeof window !== 'undefined') {
+          localStorage.setItem('fixflow_token', authData.accessToken);
+        }
+
+        // Step 4: Authoritatively verify identity against backend ME_QUERY
+        let resolvedUser: AuthUser = loggedUser;
+        try {
+          const verified = await resolveCurrentUser(authData.accessToken);
+          if (verified) {
+            resolvedUser = verified;
+          }
+        } catch (meErr: any) {
+          if (meErr?.message === 'UNAUTHENTICATED_SESSION') {
+            await logout();
+            throw new Error('Failed to verify institutional session. Please try logging in again.');
+          }
+          // If transient network glitch occurred, loggedUser from mutation is legitimate
+        }
+
+        // Step 5: Update storage, cache, and state with authoritatively resolved user
+        if (typeof window !== 'undefined') {
+          localStorage.setItem('fixflow_user', JSON.stringify(resolvedUser));
+        }
+        try {
+          apolloClient.writeQuery({
+            query: ME_QUERY,
+            data: { me: resolvedUser },
+          });
+        } catch {}
+
         setToken(authData.accessToken);
-        setUser(authData.user);
-        localStorage.setItem('fixflow_token', authData.accessToken);
-        localStorage.setItem('fixflow_user', JSON.stringify(authData.user));
-        return authData.user;
+        setUser(resolvedUser);
+
+        return resolvedUser;
+      } catch (err: any) {
+        if (typeof window !== 'undefined') {
+          localStorage.removeItem('fixflow_token');
+          localStorage.removeItem('fixflow_user');
+        }
+        setToken(null);
+        setUser(null);
+        try {
+          await apolloClient.clearStore();
+        } catch {}
+
+        const message = err?.message || '';
+
+        // Check for network or server connection failure
+        if (
+          message.includes('Failed to fetch') ||
+          message.includes('NetworkError') ||
+          message.includes('fetch failed') ||
+          err?.networkError
+        ) {
+          throw new Error(
+            'FixFlow Authentication Service is currently unreachable. Please verify your connection or ensure the backend server is running.',
+          );
+        }
+
+        // Check for uniform invalid credentials
+        if (message.includes('Invalid email or password credentials')) {
+          throw new Error('Invalid institutional credentials. Please check your campus email and password.');
+        }
+
+        throw new Error(message || 'Invalid institutional credentials. Please check your campus email and password.');
+      } finally {
+        setIsLoading(false);
       }
-    } catch (gqlErr) {
-      console.warn('Backend GraphQL unreachable or rejected. Checking institutional seed accounts...', gqlErr);
+    },
+    [executeLogin, logout, resolveCurrentUser],
+  );
+
+  const refreshUser = React.useCallback(async (): Promise<AuthUser | null> => {
+    try {
+      const verified = await resolveCurrentUser(token);
+      if (verified) {
+        setUser(verified);
+        if (typeof window !== 'undefined') {
+          localStorage.setItem('fixflow_user', JSON.stringify(verified));
+        }
+        try {
+          apolloClient.writeQuery({
+            query: ME_QUERY,
+            data: { me: verified },
+          });
+        } catch {}
+        return verified;
+      }
+      return null;
+    } catch {
+      return null;
+    }
+  }, [resolveCurrentUser, token]);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    async function initAuth() {
+      setIsLoading(true);
+      const storedToken =
+        typeof window !== 'undefined' ? localStorage.getItem('fixflow_token') : null;
+      const storedUser =
+        typeof window !== 'undefined' ? localStorage.getItem('fixflow_user') : null;
+
+      if (!storedToken) {
+        if (isMounted) {
+          setToken(null);
+          setUser(null);
+          setIsLoading(false);
+        }
+        return;
+      }
+
+      // Security: purge any legacy synthetic or mock tokens from prior offline testing
+      if (storedToken.startsWith('mock-token-')) {
+        if (typeof window !== 'undefined') {
+          localStorage.removeItem('fixflow_token');
+          localStorage.removeItem('fixflow_user');
+        }
+        if (isMounted) {
+          setToken(null);
+          setUser(null);
+          setIsLoading(false);
+        }
+        return;
+      }
+
+      // Pre-hydrate from storage for immediate responsive rendering
+      if (storedUser) {
+        try {
+          const parsed = JSON.parse(storedUser);
+          if (
+            parsed &&
+            (parsed.status === 'ACTIVE' || parsed.status === 'REJECTED' || !parsed.status)
+          ) {
+            if (isMounted) {
+              setToken(storedToken);
+              setUser(parsed);
+            }
+          } else {
+            if (typeof window !== 'undefined') {
+              localStorage.removeItem('fixflow_user');
+              localStorage.removeItem('fixflow_token');
+            }
+          }
+        } catch {
+          if (typeof window !== 'undefined') {
+            localStorage.removeItem('fixflow_user');
+          }
+        }
+      } else {
+        if (isMounted) {
+          setToken(storedToken);
+        }
+      }
+
+      // Authoritatively verify token and user identity with backend
+      try {
+        const verified = await resolveCurrentUser(storedToken);
+        if (isMounted) {
+          if (verified) {
+            setToken(storedToken);
+            setUser(verified);
+            if (typeof window !== 'undefined') {
+              localStorage.setItem('fixflow_user', JSON.stringify(verified));
+            }
+            try {
+              apolloClient.writeQuery({
+                query: ME_QUERY,
+                data: { me: verified },
+              });
+            } catch {}
+          } else {
+            await logout();
+          }
+        }
+      } catch (err: any) {
+        if (err?.message === 'UNAUTHENTICATED_SESSION') {
+          if (isMounted) {
+            await logout();
+          }
+        }
+      } finally {
+        if (isMounted) {
+          setIsLoading(false);
+        }
+      }
     }
 
-    // 2. Offline Institutional Seed Fallback Authentication
-    const seedAccount = INSTITUTIONAL_SEED_ACCOUNTS.find(
-      (acc) => acc.email.toLowerCase() === cleanEmail
-    );
+    initAuth();
 
-    if (seedAccount && (cleanPass === seedAccount.defaultPassword || cleanPass === 'password123' || cleanPass === 'admin123')) {
-      const fallbackUser: AuthUser = {
-        id: seedAccount.id,
-        email: seedAccount.email,
-        name: seedAccount.name,
-        role: seedAccount.role,
-        department: seedAccount.department,
-      };
-      const fallbackToken = `mock-token-${seedAccount.role.toLowerCase()}-${Date.now()}`;
+    return () => {
+      isMounted = false;
+    };
+  }, [logout, resolveCurrentUser]);
 
-      setToken(fallbackToken);
-      setUser(fallbackUser);
-      localStorage.setItem('fixflow_token', fallbackToken);
-      localStorage.setItem('fixflow_user', JSON.stringify(fallbackUser));
-      return fallbackUser;
-    }
-
-    throw new Error('Invalid institutional credentials. Please check your campus email and password.');
-  };
-
-  const logout = () => {
-    setToken(null);
-    setUser(null);
-    localStorage.removeItem('fixflow_token');
-    localStorage.removeItem('fixflow_user');
-  };
+  const isAuthenticated =
+    !isLoading &&
+    !!user &&
+    (user.status === 'ACTIVE' || user.status === 'REJECTED' || !user.status);
 
   return (
     <AuthContext.Provider
@@ -192,7 +420,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         logout,
         isLoading,
         loading: isLoading,
-        isAuthenticated: !!user,
+        isAuthenticated,
+        refreshUser,
       }}
     >
       {children}

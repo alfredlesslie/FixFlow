@@ -17,6 +17,7 @@ import {
 } from 'lucide-react';
 import { useDataBridge } from '@/lib/use-data-bridge';
 import { useAuth } from '@/lib/auth-context';
+import { getRoleRedirectPath } from '@/lib/role-routing';
 import { Badge } from '@/components/ui/Badge';
 import { ThemeToggle } from '@/components/ui/ThemeToggle';
 
@@ -39,10 +40,11 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
 
+  const dashboardPath = getRoleRedirectPath(authUser?.role || activeUser?.role);
   const unreadNotifications = notifications.filter((n) => !n.read);
 
-  const handleLogout = () => {
-    logout();
+  const handleLogout = async () => {
+    await logout();
     router.push('/login');
   };
 
@@ -53,7 +55,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
           {/* Logo & Platform Name */}
           <div className="flex items-center gap-6">
-            <Link href="/" className="flex items-center gap-2.5 group">
+            <Link href={dashboardPath} className="flex items-center gap-2.5 group">
               <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-sky-500 to-blue-700 flex items-center justify-center text-white shadow-md shadow-sky-500/20 group-hover:scale-105 transition-transform duration-150">
                 <Layers className="w-5 h-5" />
               </div>
@@ -71,10 +73,10 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             {/* Desktop Navigation Links */}
             <nav className="hidden md:flex items-center gap-1">
               <Link
-                href="/"
+                href={dashboardPath}
                 className={`px-3 py-1.5 text-xs font-medium rounded-lg transition-colors ${
-                  pathname === '/'
-                    ? 'bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white'
+                  pathname === dashboardPath
+                    ? 'bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white font-semibold'
                     : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800/60'
                 }`}
               >
@@ -84,7 +86,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                 href="/assets"
                 className={`px-3 py-1.5 text-xs font-medium rounded-lg transition-colors flex items-center gap-1 ${
                   pathname.startsWith('/assets')
-                    ? 'bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white'
+                    ? 'bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white font-semibold'
                     : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800/60'
                 }`}
               >
@@ -193,6 +195,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             {/* User Profile Dropdown */}
             <div className="relative">
               <button
+                id="user-menu-btn"
                 onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
                 className="flex items-center gap-2 pl-2 pr-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors haptic-press"
               >
@@ -260,16 +263,24 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         {isMobileNavOpen && (
           <div className="md:hidden px-4 pt-2 pb-4 border-t border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 space-y-1">
             <Link
-              href="/"
+              href={dashboardPath}
               onClick={() => setIsMobileNavOpen(false)}
-              className="block px-3 py-2 rounded-lg text-sm font-medium text-slate-800 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800"
+              className={`block px-3 py-2 rounded-lg text-sm font-medium ${
+                pathname === dashboardPath
+                  ? 'bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white font-semibold'
+                  : 'text-slate-800 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800'
+              }`}
             >
               Dashboard
             </Link>
             <Link
               href="/assets"
               onClick={() => setIsMobileNavOpen(false)}
-              className="block px-3 py-2 rounded-lg text-sm font-medium text-slate-800 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800"
+              className={`block px-3 py-2 rounded-lg text-sm font-medium ${
+                pathname.startsWith('/assets')
+                  ? 'bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white font-semibold'
+                  : 'text-slate-800 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800'
+              }`}
             >
               Assets & Locations
             </Link>
@@ -283,9 +294,9 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               </Link>
             )}
             <button
-              onClick={() => {
+              onClick={async () => {
                 setIsMobileNavOpen(false);
-                handleLogout();
+                await handleLogout();
               }}
               className="w-full text-left flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/40"
             >

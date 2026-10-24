@@ -20,6 +20,9 @@ export class Location {
   @Field(() => String, { nullable: true, description: 'Room or hall number' })
   roomNumber?: string | null;
 
+  @Field(() => String, { nullable: true, description: 'Room or hall number (alias)' })
+  room?: string | null;
+
   @Field(() => String, { nullable: true, description: 'Additional location remarks' })
   description?: string | null;
 

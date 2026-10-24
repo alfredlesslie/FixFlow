@@ -2,6 +2,46 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
+"""Lifecycle state of an institutional account in FixFlow"""
+enum AccountStatus {
+  ACTIVE
+  PENDING_APPROVAL
+  PENDING_VERIFICATION
+  REJECTED
+  SUSPENDED
+}
+
+"""Executive operational metrics and SLA performance indicators"""
+type AnalyticsSummary {
+  """Active dispatched technician work orders"""
+  activeWorkOrders: Int!
+
+  """Urgent requests classified as CRITICAL or HIGH priority"""
+  criticalOrHigh: Int!
+
+  """Mean Time to Resolution (MTTR) in hours"""
+  mttrHours: Float!
+
+  """Resolved work orders awaiting facility manager verification"""
+  pendingVerification: Int!
+
+  """SLA target compliance percentage rate"""
+  slaComplianceRate: Float!
+
+  """Total maintenance requests logged"""
+  totalRequests: Int!
+
+  """Active unresolved requests"""
+  unresolvedRequests: Int!
+}
+
+"""Review status of an institutional role application"""
+enum ApplicationStatus {
+  APPROVED
+  PENDING_REVIEW
+  REJECTED
+}
+
 """Institutional campus asset specification and operational lifecycle"""
 type Asset {
   """Unique institutional asset tag, e.g. AST-AC-ENG-101"""
@@ -117,6 +157,43 @@ type AuthPayload {
   user: User!
 }
 
+"""Maintenance request conversational comment and diagnostic note"""
+type Comment {
+  """Author institutional user profile"""
+  author: User
+  authorId: String!
+
+  """Comment message body"""
+  content: String!
+  createdAt: DateTime!
+  id: ID!
+
+  """Whether this comment is an internal staff-only technical note"""
+  isInternal: Boolean!
+  requestId: String!
+}
+
+"""
+Payload for technician submission of repair completion and parts consumption
+"""
+input CompleteWorkOrderInput {
+  """Actual expenditures for parts and labor"""
+  actualCost: Float
+  id: ID!
+
+  """Parts replaced and consumed during repair"""
+  partsUsed: String
+
+  """Diagnostic breakdown and root cause details"""
+  repairDetails: String
+
+  """Detailed resolution summary describing how the issue was resolved"""
+  resolutionSummary: String!
+
+  """Final technician notes"""
+  workNotes: String
+}
+
 """Payload for creating a new asset classification category"""
 input CreateAssetCategoryInput {
   """Unique category identifier code, e.g. HVAC"""
@@ -163,6 +240,20 @@ input CreateAssetInput {
   warrantyExpiry: DateTime
 }
 
+"""
+Payload for posting a conversational comment or internal note on a request
+"""
+input CreateCommentInput {
+  """Comment text content"""
+  content: String!
+
+  """
+  Whether note is restricted to staff (technicians and facility managers)
+  """
+  isInternal: Boolean = false
+  requestId: ID!
+}
+
 """Payload for registering a new campus location"""
 input CreateLocationInput {
   """Campus building name"""
@@ -180,6 +271,41 @@ input CreateLocationInput {
   roomNumber: String
 }
 
+"""Payload for reporting a new campus maintenance request"""
+input CreateRequestInput {
+  """Optional ID of the specific affected campus asset"""
+  assetId: ID
+
+  """Detailed problem description and symptoms"""
+  description: String!
+
+  """
+  Initial reported severity assessment from 1 (minor) to 10 (critical emergency)
+  """
+  initialSeverity: Int = 5
+
+  """ID of the physical campus location"""
+  locationId: ID!
+
+  """Concise summary of the maintenance issue"""
+  title: String!
+}
+
+"""Payload for creating and dispatching a technician work order"""
+input CreateWorkOrderInput {
+  """Estimated repair cost"""
+  estimatedCost: Float
+
+  """Dispatch instructions and safety guidelines"""
+  instructions: String
+
+  """ID of the maintenance request to resolve"""
+  requestId: ID!
+
+  """ID of the technician assigned to execute the repair"""
+  technicianId: ID!
+}
+
 """Criticality level of campus equipment"""
 enum Criticality {
   CRITICAL
@@ -192,6 +318,21 @@ enum Criticality {
 A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
 """
 scalar DateTime
+
+"""
+Payload for transferring active work order responsibility to another technician
+"""
+input HandoverWorkOrderInput {
+  """Technical notes and status for the incoming technician"""
+  handoverNotes: String!
+
+  """ID of the technician assuming responsibility"""
+  nextTechId: ID!
+
+  """Reason for transfer (shift change, specialized tooling, etc.)"""
+  reason: String
+  workOrderId: ID!
+}
 
 """FixFlow system health check response"""
 type HealthCheckPayload {
@@ -233,6 +374,9 @@ type Location {
   """Descriptive location name"""
   name: String!
 
+  """Room or hall number (alias)"""
+  room: String
+
   """Room or hall number"""
   roomNumber: String
   updatedAt: DateTime!
@@ -247,18 +391,213 @@ input LoginInput {
   password: String!
 }
 
+"""Permanent equipment maintenance history record"""
+type MaintenanceRecord {
+  """Action taken on the equipment"""
+  actionTaken: String!
+  assetId: String!
+
+  """Total parts and labor expense incurred"""
+  cost: Float
+  createdAt: DateTime!
+  dateCompleted: DateTime!
+  id: ID!
+
+  """List or description of replaced components"""
+  partsReplaced: String
+
+  """Detailed diagnostic and repair observations"""
+  repairDetails: String
+  technician: User
+  technicianId: String!
+  workOrderId: String
+}
+
+"""
+Institutional campus maintenance request specification and operational lifecycle
+"""
+type MaintenanceRequest {
+  """Optional affected campus asset"""
+  asset: Asset
+  assetId: String
+
+  """Timestamp when request was closed and verified"""
+  closedAt: DateTime
+  createdAt: DateTime!
+
+  """Detailed problem description and symptoms"""
+  description: String!
+
+  """Original request tracking ID if this request is a duplicate"""
+  duplicateOfId: String
+
+  """Original request number (e.g. REQ-2026-0001) if marked as duplicate"""
+  duplicateOfNumber: String
+
+  """Reason this request was marked as a duplicate"""
+  duplicateReason: String
+
+  """Whether current authenticated user has upvoted this request"""
+  hasUpvoted: Boolean!
+  id: ID!
+
+  """Whether this request has been marked as a duplicate"""
+  isDuplicate: Boolean!
+
+  """Physical campus housing location"""
+  location: Location!
+  locationId: String!
+
+  """Derived maintenance priority level: LOW, MEDIUM, HIGH, CRITICAL"""
+  priority: Priority!
+
+  """Administrative rejection rationale if rejected"""
+  rejectionReason: String
+
+  """Unique institutional request tracking number, e.g. REQ-2026-0001"""
+  requestNumber: String!
+
+  """Campus user who reported this maintenance request"""
+  requester: User!
+  requesterId: String!
+
+  """Timestamp when maintenance resolution occurred"""
+  resolvedAt: DateTime
+
+  """Whether SLA target deadline has been breached"""
+  slaBreached: Boolean!
+
+  """SLA target resolution deadline"""
+  slaDeadline: DateTime!
+
+  """Target resolution duration in hours"""
+  slaTargetHours: Int!
+
+  """
+  Request lifecycle state: OPEN, TRIAGED, ASSIGNED, IN_PROGRESS, RESOLVED, VERIFIED, CLOSED, REOPENED
+  """
+  status: RequestStatus!
+
+  """Concise summary of the maintenance issue"""
+  title: String!
+  updatedAt: DateTime!
+
+  """Total occupant and community upvotes"""
+  upvotesCount: Int!
+
+  """Post-resolution verification findings"""
+  verificationNotes: String
+}
+
+"""Institutional preventive maintenance schedule"""
+type MaintenanceSchedule {
+  """Target campus equipment asset"""
+  asset: Asset
+  assetId: String!
+  createdAt: DateTime!
+
+  """Task protocol and instructions"""
+  description: String
+
+  """Recurring frequency in days"""
+  frequencyDays: Int!
+  id: ID!
+  isEnabled: Boolean!
+  lastCompletedDate: DateTime
+
+  """Target date when next preventive cycle is due"""
+  nextDueDate: DateTime!
+
+  """Scheduled maintenance task title"""
+  title: String!
+  updatedAt: DateTime!
+}
+
 type Mutation {
+  """Technician acceptance of an assigned work order"""
+  acceptWorkOrder(id: ID!): WorkOrder!
+
+  """
+  Approve an institutional staff registration application and activate the user (Admin only)
+  """
+  approveRegistrationApplication(id: ID!): RegistrationApplication!
+
+  """Submit repair completion, consumed parts, and cost accounting"""
+  completeWorkOrder(input: CompleteWorkOrderInput!): WorkOrder!
+
   """Register a new institutional asset (Facility Manager or Admin only)"""
   createAsset(input: CreateAssetInput!): Asset!
 
   """Create a new asset category (Facility Manager or Admin only)"""
   createAssetCategory(input: CreateAssetCategoryInput!): AssetCategory!
 
+  """Post a comment or technical internal note on a maintenance request"""
+  createComment(input: CreateCommentInput!): Comment!
+
   """Create a new campus location (Facility Manager or Admin only)"""
   createLocation(input: CreateLocationInput!): Location!
 
+  """
+  Submit a new campus maintenance request with server-derived priority and SLA
+  """
+  createRequest(input: CreateRequestInput!): MaintenanceRequest!
+
+  """
+  Dispatch a maintenance request to an active technician (Facility Manager or Admin only)
+  """
+  createWorkOrder(input: CreateWorkOrderInput!): WorkOrder!
+
+  """
+  Transfer active work order to another certified technician with mandatory shift handover notes
+  """
+  handoverWorkOrder(input: HandoverWorkOrderInput!): WorkOrder!
+
   """Authenticate an institutional user and issue a JWT Bearer token"""
   login(input: LoginInput!): AuthPayload!
+
+  """Mark all unread notifications as read for the current user"""
+  markAllNotificationsAsRead: Boolean!
+
+  """Mark an individual notification as read"""
+  markNotificationAsRead(id: ID!): Notification!
+
+  """Mark a maintenance request as a duplicate of another primary request"""
+  markRequestAsDuplicate(duplicateRequestId: ID!, originalRequestId: ID!, reason: String): MaintenanceRequest!
+
+  """
+  Manually override maintenance request priority (Facility Manager or Admin only)
+  """
+  overridePriority(id: ID!, priority: Priority!, reason: String!): MaintenanceRequest!
+
+  """Submit a revised application for a previously rejected registration"""
+  reapplyRegistration(input: ReapplyInput!): RegistrationResponse!
+
+  """
+  Submit institutional requester registration (students & standard staff)
+  """
+  registerRequester(input: RegisterRequesterInput!): RegistrationResponse!
+
+  """
+  Submit institutional staff registration (technicians & facility managers)
+  """
+  registerStaff(input: RegisterStaffInput!): RegistrationResponse!
+
+  """
+  Reject an institutional staff registration application with documented reason (Admin only)
+  """
+  rejectRegistrationApplication(id: ID!, reason: String!): RegistrationApplication!
+
+  """Remove an upvote from a maintenance request"""
+  removeUpvote(id: ID!): MaintenanceRequest!
+
+  """Reopen a previously resolved or closed maintenance request"""
+  reopenRequest(id: ID!, reason: String!): MaintenanceRequest!
+
+  """Request a new email verification link with rate limiting cooldown"""
+  resendVerificationEmail(input: ResendVerificationInput!): OperationStatusResponse!
+
+  """Unmark a duplicate maintenance request, restoring it as independent"""
+  unmarkRequestDuplicate(duplicateRequestId: ID!): MaintenanceRequest!
 
   """
   Update asset specifications or location (Facility Manager or Admin only)
@@ -273,9 +612,74 @@ type Mutation {
 
   """Update campus location details (Facility Manager or Admin only)"""
   updateLocation(id: ID!, input: UpdateLocationInput!): Location!
+
+  """Update user active state / account suspension (Admin only)"""
+  updateUserActive(id: ID!, isActive: Boolean!): User!
+
+  """Update user institutional access role (Admin only)"""
+  updateUserRole(id: ID!, role: Role!): User!
+
+  """Update operational status and progress notes on an active work order"""
+  updateWorkOrderStatus(input: UpdateWorkOrderStatusInput!): WorkOrder!
+
+  """Upvote an active maintenance request to signal community impact"""
+  upvoteRequest(id: ID!): MaintenanceRequest!
+
+  """Verify institutional email address using secure single-use token"""
+  verifyEmail(input: VerifyEmailInput!): VerifyEmailResponse!
+
+  """
+  Verify and sign-off (or reject with rework) on completed work orders (Facility Manager or Admin only)
+  """
+  verifyWorkOrder(input: VerifyWorkOrderInput!): WorkOrder!
+}
+
+"""Institutional system notification and activity alert"""
+type Notification {
+  createdAt: DateTime!
+  id: ID!
+
+  """Whether the notification has been marked as read"""
+  isRead: Boolean!
+
+  """Direct navigation link"""
+  link: String
+
+  """Detailed notification message body"""
+  message: String!
+
+  """Notification subject headline"""
+  title: String!
+
+  """Notification category, e.g. WORK_ORDER_ASSIGNED"""
+  type: String!
+  userId: String!
+}
+
+"""Result of generic authentication operation"""
+type OperationStatusResponse {
+  """
+  Indicates whether the verification email was accepted by the mail provider
+  """
+  emailDispatched: Boolean
+  message: String!
+  success: Boolean!
+}
+
+"""Maintenance request priority level"""
+enum Priority {
+  CRITICAL
+  HIGH
+  LOW
+  MEDIUM
 }
 
 type Query {
+  """
+  Retrieve campus-wide live operational analytics, unresolved counts, and SLA metrics
+  """
+  analyticsSummary: AnalyticsSummary!
+
   """Retrieve complete asset details by unique ID"""
   asset(id: ID!): Asset!
 
@@ -296,6 +700,16 @@ type Query {
   """Retrieve system security and operational audit logs (Admin only)"""
   auditLogs(entity: String, limit: Int = 50): [AuditLog!]!
 
+  """
+  Retrieve conversational comment history and staff notes for a maintenance request
+  """
+  comments(requestId: ID!): [Comment!]!
+
+  """
+  Retrieve latest unhashed verification token for an email (Development environment only; fails closed in production)
+  """
+  devLatestVerificationToken(email: String!): String
+
   """System health check and database connectivity verification"""
   healthCheck: HealthCheckPayload!
 
@@ -305,14 +719,181 @@ type Query {
   """Retrieve all campus facilities, buildings, and rooms"""
   locations: [Location!]!
 
+  """
+  Retrieve institutional preventive maintenance schedules and upcoming due dates
+  """
+  maintenanceSchedules: [MaintenanceSchedule!]!
+
   """Retrieve profile details of the currently authenticated user"""
   me: User!
 
-  """Retrieve user details by ID"""
+  """
+  Retrieve institutional activity notifications for the currently authenticated user
+  """
+  notifications: [Notification!]!
+
+  """
+  Retrieve details of a single registration application by ID (Admin only)
+  """
+  registrationApplication(id: ID!): RegistrationApplication!
+
+  """
+  Retrieve institutional registration applications with optional status filtering (Admin only)
+  """
+  registrationApplications(status: ApplicationStatus): [RegistrationApplication!]!
+
+  """Retrieve complete maintenance request details by unique ID"""
+  request(id: ID!): MaintenanceRequest!
+
+  """
+  Retrieve campus maintenance requests with multi-criteria filtering and text search
+  """
+  requests(filter: RequestFilterInput): [MaintenanceRequest!]!
+
+  """Find similar active requests to prevent duplicate submissions"""
+  suggestDuplicateRequests(locationId: ID, title: String!): [MaintenanceRequest!]!
+
+  """Retrieve user details by ID (Self-view or Admin/Facility Manager only)"""
   user(id: ID!): User!
 
   """List institutional users (restricted to ADMIN and FACILITY_MANAGER)"""
   users(role: Role): [User!]!
+
+  """Retrieve detailed work order execution record by unique ID"""
+  workOrder(id: ID!): WorkOrder!
+
+  """Retrieve technician work orders with multi-criteria filtering"""
+  workOrders(filter: WorkOrderFilterInput): [WorkOrder!]!
+}
+
+"""Reapplication input for previously rejected institutional applicants"""
+input ReapplyInput {
+  appointmentJustification: String
+  certificationNumber: String
+  contactNumber: String!
+  department: String!
+  facilityScope: String
+  institutionalId: String!
+
+  """Role requested: TECHNICIAN or FACILITY_MANAGER"""
+  requestedRole: Role!
+  tradeDiscipline: String
+  yearsExperience: String
+}
+
+"""Institutional requester (student/faculty) registration input"""
+input RegisterRequesterInput {
+  department: String
+  email: String!
+  firstName: String!
+  institutionalId: String
+  lastName: String!
+  password: String!
+  phone: String
+}
+
+"""
+Institutional staff (technician or facility manager) registration input
+"""
+input RegisterStaffInput {
+  appointmentJustification: String
+  certificationNumber: String
+  contactNumber: String!
+  department: String!
+  email: String!
+  facilityScope: String
+  firstName: String!
+  institutionalId: String!
+  lastName: String!
+  password: String!
+
+  """Role requested: TECHNICIAN or FACILITY_MANAGER"""
+  requestedRole: Role!
+  tradeDiscipline: String
+  yearsExperience: String
+}
+
+"""Institutional role application for administrator review"""
+type RegistrationApplication {
+  applicantEmail: String!
+  applicantName: String!
+  appointmentJustification: String
+  certificationNumber: String
+  contactNumber: String!
+  createdAt: DateTime!
+  department: String!
+  emailVerified: Boolean!
+  facilityScope: String
+  id: ID!
+  institutionalId: String!
+  rejectionReason: String
+  requestedRole: Role!
+  reviewedAt: DateTime
+  reviewedById: String
+  status: ApplicationStatus!
+  submittedAt: DateTime!
+  tradeDiscipline: String
+  updatedAt: DateTime!
+  userId: String
+  yearsExperience: String
+}
+
+"""Result of an institutional registration submission"""
+type RegistrationResponse {
+  applicationId: ID
+
+  """
+  Indicates whether the verification email was accepted by the mail provider
+  """
+  emailDispatched: Boolean
+  message: String!
+  status: AccountStatus!
+  success: Boolean!
+  user: User
+}
+
+"""Filter and search criteria for querying maintenance requests"""
+input RequestFilterInput {
+  """Filter by campus asset ID"""
+  assetId: ID
+
+  """Filter by equipment category ID"""
+  categoryId: ID
+
+  """Filter by campus location ID"""
+  locationId: ID
+
+  """Filter only requests reported by the current authenticated user"""
+  myReportsOnly: Boolean
+
+  """Filter by derived priority level"""
+  priority: Priority
+
+  """Filter by requester user ID"""
+  requesterId: ID
+
+  """Fuzzy search across title, description, and requestNumber"""
+  search: String
+
+  """Filter by request lifecycle state"""
+  status: RequestStatus
+}
+
+"""Maintenance request lifecycle state"""
+enum RequestStatus {
+  ASSIGNED
+  CLOSED
+  IN_PROGRESS
+  OPEN
+  REOPENED
+  RESOLVED
+  TRIAGED
+  VERIFIED
+}
+
+"""Resend verification email input"""
+input ResendVerificationInput {
+  email: String!
 }
 
 """User access control roles in FixFlow"""
@@ -355,13 +936,31 @@ input UpdateLocationInput {
   roomNumber: String
 }
 
+"""Payload for updating operational progress on an active work order"""
+input UpdateWorkOrderStatusInput {
+  id: ID!
+  status: WorkOrderStatus!
+
+  """Technician ongoing diagnostic logs and observations"""
+  workNotes: String
+}
+
 """FixFlow institutional user profile"""
 type User {
   createdAt: DateTime!
   department: String
   email: String!
+
+  """Whether institutional email ownership is verified"""
+  emailVerified: Boolean!
+
+  """Timestamp when email ownership was verified"""
+  emailVerifiedAt: DateTime
   firstName: String!
   id: ID!
+
+  """Institutional roll or employee ID"""
+  institutionalId: String
   isActive: Boolean!
   lastName: String!
 
@@ -369,5 +968,128 @@ type User {
   name: String!
   phone: String
   role: Role!
+
+  """Account lifecycle state"""
+  status: AccountStatus!
   updatedAt: DateTime!
+}
+
+"""Verification token input"""
+input VerifyEmailInput {
+  """Raw verification token received via institutional email"""
+  token: String!
+}
+
+"""Result of email verification"""
+type VerifyEmailResponse {
+  message: String!
+  status: AccountStatus!
+  success: Boolean!
+  user: User
+}
+
+"""Payload for facility manager sign-off or rejection of completed work"""
+input VerifyWorkOrderInput {
+  """Whether the repair work is approved and verified as satisfactory"""
+  approved: Boolean!
+  id: ID!
+
+  """Verification findings or rework instructions if rejected"""
+  notes: String
+}
+
+"""Technician dispatched work order and repair lifecycle"""
+type WorkOrder {
+  """Final actual parts and materials expenditure"""
+  actualCost: Float
+
+  """Associated equipment asset"""
+  asset: Asset
+  assetId: String
+
+  """Timestamp when technician completed physical repair"""
+  completedAt: DateTime
+  createdAt: DateTime!
+
+  """Initial estimated repair expenditure"""
+  estimatedCost: Float
+
+  """Shift transition and technician handover trail"""
+  handovers: [WorkOrderHandover!]!
+  id: ID!
+
+  """Manager instructions and special safety protocols"""
+  instructions: String
+
+  """Unique institutional work order number, e.g. WO-2026-0001"""
+  orderNumber: String!
+
+  """Itemized or serialized spare parts consumed"""
+  partsUsed: String
+
+  """Recorded maintenance action logs"""
+  records: [MaintenanceRecord!]!
+
+  """Associated campus maintenance request"""
+  request: MaintenanceRequest
+  requestId: String!
+
+  """Post-completion summary of repair actions"""
+  resolutionSummary: String
+
+  """Timestamp when technician commenced physical work"""
+  startedAt: DateTime
+
+  """
+  Current execution status: PENDING, ACCEPTED, IN_PROGRESS, ON_HOLD, COMPLETED, CANCELLED
+  """
+  status: WorkOrderStatus!
+
+  """Assigned certified technician"""
+  technician: User
+  technicianId: String
+  updatedAt: DateTime!
+
+  """Technician ongoing diagnostic logs and work notes"""
+  workNotes: String
+}
+
+"""Filter criteria for querying technician work orders"""
+input WorkOrderFilterInput {
+  """Filter only work orders assigned to current technician"""
+  myWorkOnly: Boolean
+
+  """Filter by maintenance request ID"""
+  requestId: ID
+  status: WorkOrderStatus
+
+  """Filter by assigned technician ID"""
+  technicianId: ID
+}
+
+"""Technician shift transition and responsibility handover record"""
+type WorkOrderHandover {
+  createdAt: DateTime!
+
+  """Technical context notes and diagnostics handed over"""
+  handoverNotes: String!
+  id: ID!
+  nextTech: User!
+  nextTechId: String!
+  previousTech: User
+  previousTechId: String
+
+  """Administrative reason for handover"""
+  reason: String
+  workOrderId: String!
+}
+
+"""Technician work order state"""
+enum WorkOrderStatus {
+  ACCEPTED
+  CANCELLED
+  COMPLETED
+  IN_PROGRESS
+  ON_HOLD
+  PENDING
 }

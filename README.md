@@ -1,105 +1,138 @@
 # FixFlow — Campus Maintenance & Asset Lifecycle Management Platform
 
-FixFlow is a centralized, production-quality web platform designed for educational institutions (universities, colleges, hostels, and campus facilities) to manage the entire lifecycle of physical infrastructure and equipment.
+FixFlow is a comprehensive, production-grade web platform engineered for higher-education campuses and institutions (universities, colleges, residential hostels, and research facilities) to streamline facilities maintenance, track equipment lifecycles, and enforce deterministic service-level agreements (SLAs).
 
 ---
 
-## 1. Core Value Proposition
+## 1. Key Features & Capabilities
 
-Institutions frequently face delayed equipment repairs, opaque maintenance workflows, unrecorded asset downtime, and lack of accountability. FixFlow provides:
-
-1. **Campus Asset Inventory**: Full lifecycle tracking of air conditioners, projectors, lab equipment, generators, pumps, and IT infrastructure.
-2. **Deterministic SLAs**: Enforced resolution deadlines based on request priority (Critical: 2h, High: 6h, Medium: 24h, Low: 72h).
-3. **Technician Dispatch**: Work order lifecycle, task progression, repair notes, and parts documentation.
-4. **Preventive Maintenance**: Recurring schedules with upcoming, due, and overdue tracking.
-5. **Auditing & Verification**: End-to-end request verification and audit logging.
-6. **Role-Based Access Control (RBAC)**: Requester, Technician, Facility Manager, and Administrator.
+- **Campus Asset Inventory:** Complete lifecycle management for HVAC, electrical, laboratory, and IT equipment across campus buildings, floors, and rooms.
+- **Deterministic SLA Engine:** Automated priority scoring and SLA deadline calculation (Critical: 2h, High: 6h, Medium: 24h, Low: 72h).
+- **Technician Dispatch & Workbench:** Step-by-step repair state progression, parts and consumables logging, before/after evidence photos, and shift notes.
+- **Facility Manager Command Center:** Interactive Triage Queue, Verification Studio, Critical/High Severity filtering, priority overrides, and technician dispatch.
+- **Campus Issue Discovery & Upvoting:** Feed discovery, upvoting with duplicate prevention idempotency, and live duplicate suggestion banner.
+- **Staff Governance & Verification:** Self-service registration with institutional email verification (Mailpit SMTP) and administrator review queue.
+- **Role-Based Access Control (RBAC):** Station isolation across Requester, Technician, Facility Manager, and Administrator roles with automatic Apollo cache isolation.
+- **Immutable Audit Logging:** Operational audit trail tracking key actions with automatic sensitive credential scrubbing.
 
 ---
 
-## 2. Architecture & Tech Stack
-
-FixFlow is built as a clean **Modular Monolith**:
+## 2. Architecture & Technology Stack
 
 | Component | Technology | Description |
 |---|---|---|
-| **Frontend** | Next.js 14 (App Router), React 18, Tailwind CSS | High-performance, accessible, data-focused dashboard UI |
-| **API Layer** | Apollo GraphQL | Type-safe, field-level operations via queries and mutations |
-| **Backend** | NestJS (Node.js & TypeScript) | Domain-driven modular architecture with guards and validation |
-| **Data Access** | Prisma ORM | Strictly typed PostgreSQL schema with full foreign keys |
-| **Database** | PostgreSQL 16 / 18 | Relational persistence with transactional integrity |
-| **DevOps** | Docker, Docker Compose, Kubernetes | Containerization and deployment readiness |
+| **Frontend** | Next.js 14 (App Router), React 18, Tailwind CSS | High-performance dashboard UI with Apollo Client integration |
+| **API Layer** | Apollo GraphQL & Apollo Server 4 | Type-safe queries, mutations, and field-level resolvers |
+| **Backend** | NestJS 10, TypeScript | Domain-driven modular architecture with guards, interceptors, and DTOs |
+| **Data Access** | Prisma ORM 5 | Type-safe query builder, relation modeling, and migration engine |
+| **Database** | PostgreSQL 16+ | ACID-compliant relational storage with transactional integrity |
+| **Email Testing** | Mailpit | Local SMTP server (`:1025`) and HTTP inspection API (`:8025`) |
+| **Testing** | Playwright (E2E), Jest (Unit/Integration) | 11 browser acceptance suites + 33 backend suites (273 tests) |
+| **Containerization** | Docker, Docker Compose | Multi-container setup with network bridging and volume mounts |
 
 ---
 
 ## 3. Quickstart & Local Setup
 
-### Step 1: Start Local PostgreSQL Database
-FixFlow bundles an embedded PostgreSQL engine for zero-config local evaluation:
+### Prerequisites
+- **Node.js:** v20+ or v22 LTS
+- **Docker Desktop:** 4.x (running Linux containers)
+- **PostgreSQL:** PostgreSQL 16+ (e.g. running on port `5432`)
+- **Package Manager:** npm 10+ (workspace-aware)
+
+---
+
+### Step 1: Environment Configuration
+Copy [.env.example](file:///c:/projects/FixFlow/.env.example) to `.env`:
 ```powershell
-npm run db:start
+cp .env.example .env
 ```
-PostgreSQL will run on `postgresql://postgres:postgres@localhost:5432/fixflow_db`.
+Configure your local database password and secrets in `.env`:
+```env
+DATABASE_URL="postgresql://postgres:<YOUR_PASSWORD>@localhost:5432/fixflow_db?schema=public"
+DOCKER_DATABASE_URL="postgresql://postgres:<YOUR_PASSWORD>@host.docker.internal:5432/fixflow_db?schema=public"
+JWT_SECRET="<YOUR_STRONG_RANDOM_SECRET_AT_LEAST_32_CHARS>"
+```
+*(Never commit `.env` containing real credentials to source control).*
 
-### Step 2: Push Database Schema & Seed Data
-In a second terminal:
+---
+
+### Step 2: Apply Database Migrations
+Apply the migration chain (`0_init`, `20261014184500_account_lifecycle_and_location`, `20261024163000_phase_6o_votes_duplicates_storage`):
 ```powershell
-# Push Prisma schema to PostgreSQL
-npm run prisma:push --workspace=backend
-
-# Seed users, locations, categories, and 15+ assets
-npm run db:seed
+npx.cmd --workspace=backend prisma migrate deploy
 ```
 
-### Step 3: Run Backend (NestJS)
+---
+
+### Step 3: Run the Application
+
+#### Option A: Docker Compose (Recommended)
+Launch backend, frontend, and Mailpit services:
 ```powershell
+docker compose up -d backend frontend mailpit
+```
+- **Frontend Dashboard:** `http://localhost:3000`
+- **Backend API:** `http://localhost:4000`
+- **GraphQL Endpoint:** `http://localhost:4000/graphql`
+- **Health Check:** `http://localhost:4000/api/health`
+- **Mailpit Email UI:** `http://localhost:8025`
+
+#### Option B: Local Node.js Development
+```powershell
+# Terminal 1 — Backend
 npm run dev:backend
-# API running at: http://localhost:4000
-# GraphQL Playground: http://localhost:4000/graphql
-# Health check: http://localhost:4000/api/health
-```
 
-### Step 4: Run Frontend (Next.js)
-```powershell
+# Terminal 2 — Frontend
 npm run dev:frontend
-# UI running at: http://localhost:3000
 ```
 
 ---
 
-## 4. Demo Accounts & Credentials
-
-| Role | Email | Password | Pre-fill Available |
-|---|---|---|---|
-| **Facility Manager** | `manager@fixflow.edu` | `Manager@123` | Yes (`/login`) |
-| **Technician** | `tech.rahul@fixflow.edu` | `Tech@123` | Yes (`/login`) |
-| **Requester (Student)** | `student.riya@fixflow.edu` | `Student@123` | Yes (`/login`) |
-| **Administrator** | `admin@fixflow.edu` | `Admin@123` | Yes (`/login`) |
-
----
-
-## 5. Running Automated Tests
-
-Run backend unit and integration tests:
+### Step 4: Provision Administrator & Reset Demo Accounts
+To provision the initial administrator account via secure CLI prompt:
 ```powershell
-cd backend
-npm test
+npm run bootstrap:admin
 ```
-All 5 test suites (22 tests) cover authentication, JWT issuance, roles guard, asset CRUD validation, and location/category constraints.
+To reset local demo passwords safely without mutating application records:
+```powershell
+npm run reset:demo-passwords
+```
 
 ---
 
-## 6. Development Roadmap
+## 4. Automated Testing
 
-- [x] **Phase 1 — Foundation**: Monorepo scaffolding, NestJS backend, GraphQL health endpoint, Prisma schema with 12 entities, Next.js frontend with Apollo Client, and Docker manifests.
-- [x] **Phase 2 — Core Backend, Auth & Asset Management**: PostgreSQL setup, Prisma migration & seeding, JWT authentication (`login`, `me`), RBAC (`@Roles(...)`, `RolesGuard`), User management, Campus Locations CRUD, Asset Categories CRUD, Campus Asset Registry with search & multi-filtering, audit logging, and automated Jest tests.
-- [ ] **Phase 3 — Maintenance Requests & Work Orders**: Strict state machine (OPEN -> TRIAGED -> ASSIGNED -> IN_PROGRESS -> RESOLVED -> VERIFIED -> CLOSED), SLA calculation engine, technician assignment, and repair execution.
-- [ ] **Phase 4 — Preventive Maintenance & History**: Maintenance schedules, upcoming/due/overdue status engine, and asset maintenance history records.
-- [ ] **Phase 5 — Role Dashboards & Analytics**: Requester, Technician, Facility Manager, and Admin dashboards with SLA compliance and failure analytics.
-- [ ] **Phase 6 — Enhancements & University Submission**: QR code routes (`/assets/[id]`), in-app notifications, Docker Compose verification, Kubernetes manifests, and academic documentation.
+FixFlow includes two comprehensive automated testing layers:
+
+```powershell
+# Run backend unit and integration test suite (33 suites, 273 tests)
+npm test --workspace=backend
+
+# Run frontend type-checking and production build
+npm run build --workspace=frontend
+
+# Run full browser end-to-end acceptance suite (11 suites, 38 tests)
+npx.cmd playwright test
+```
+
+For detailed testing guidelines, refer to [docs/testing.md](file:///c:/projects/FixFlow/docs/testing.md).
 
 ---
 
-## 7. License
+## 5. Comprehensive Documentation
 
-Academic project developed for University Web Technologies evaluation.
+Detailed technical documentation is available in the [docs/](file:///c:/projects/FixFlow/docs/) directory:
+
+- [Architecture & Domain Model](file:///c:/projects/FixFlow/docs/architecture.md): System architecture, RBAC rules, state machines, and lifecycle diagrams.
+- [Setup & Development Guide](file:///c:/projects/FixFlow/docs/setup.md): Environment requirements, Docker workflows, and database procedures.
+- [Database & Schema Guide](file:///c:/projects/FixFlow/docs/database.md): Prisma models, relational schema, indexes, and migration strategy.
+- [GraphQL API Specification](file:///c:/projects/FixFlow/docs/graphql.md): Complete schema documentation, queries, mutations, and error handling.
+- [Testing & Quality Assurance Guide](file:///c:/projects/FixFlow/docs/testing.md): Unit test matrix, Playwright E2E suites, and test data safety.
+- [Production Deployment Guide](file:///c:/projects/FixFlow/docs/deployment.md): Reverse proxy trust (`TRUST_PROXY`), rate limiting, scaling, and security headers.
+
+---
+
+## 6. License & Academic Attribution
+
+Developed as a Web Technologies Capstone Project. Educational and institutional use permitted.

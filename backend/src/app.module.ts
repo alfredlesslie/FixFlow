@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { GraphQLModule } from '@nestjs/graphql';
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { join } from 'path';
@@ -11,6 +11,16 @@ import { AuthModule } from './auth/auth.module';
 import { LocationsModule } from './locations/locations.module';
 import { AssetCategoriesModule } from './asset-categories/asset-categories.module';
 import { AssetsModule } from './assets/assets.module';
+import { MailModule } from './mail/mail.module';
+import { AttachmentsModule } from './attachments/attachments.module';
+import { RequestsModule } from './requests/requests.module';
+import { WorkOrdersModule } from './work-orders/work-orders.module';
+import { CommentsModule } from './comments/comments.module';
+import { NotificationsModule } from './notifications/notifications.module';
+import { AnalyticsModule } from './analytics/analytics.module';
+import { SchedulesModule } from './schedules/schedules.module';
+import { isGraphQLPlaygroundEnabled, isDevOrTestEnvironment } from './common/config/environment.helper';
+import { formatGraphQLError } from './common/config/graphql-error.helper';
 
 @Module({
   imports: [
@@ -18,22 +28,40 @@ import { AssetsModule } from './assets/assets.module';
       isGlobal: true,
       envFilePath: ['.env', '../.env'],
     }),
-    GraphQLModule.forRoot<ApolloDriverConfig>({
+    GraphQLModule.forRootAsync<ApolloDriverConfig>({
       driver: ApolloDriver,
-      autoSchemaFile: join(process.cwd(), 'src/schema.gql'),
-      sortSchema: true,
-      playground: true,
-      introspection: true,
-      context: ({ req, res }) => ({ req, res }),
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: (config: ConfigService) => {
+        const isPlaygroundAllowed = isGraphQLPlaygroundEnabled(config);
+        const isDevOrTest = isDevOrTestEnvironment(config.get<string>('NODE_ENV'));
+        return {
+          autoSchemaFile: isDevOrTest ? join(process.cwd(), 'src/schema.gql') : true,
+          sortSchema: true,
+          playground: isPlaygroundAllowed,
+          introspection: isPlaygroundAllowed,
+          context: ({ req, res }) => ({ req, res }),
+          formatError: (formattedError: any) =>
+            formatGraphQLError(formattedError, config.get<string>('NODE_ENV')),
+        };
+      },
     }),
     PrismaModule,
     AuditModule,
     HealthModule,
     UsersModule,
+    MailModule,
     AuthModule,
     LocationsModule,
     AssetCategoriesModule,
     AssetsModule,
+    AttachmentsModule,
+    RequestsModule,
+    WorkOrdersModule,
+    CommentsModule,
+    NotificationsModule,
+    AnalyticsModule,
+    SchedulesModule,
   ],
 })
 export class AppModule {}

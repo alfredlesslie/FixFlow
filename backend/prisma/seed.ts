@@ -4,6 +4,13 @@ import * as bcrypt from 'bcryptjs';
 const prisma = new PrismaClient();
 
 async function main() {
+  if (process.env.NODE_ENV === 'production') {
+    throw new Error(
+      '[Security Exception] Database seeding with predictable development demo credentials is strictly prohibited in production environments. ' +
+        'Provision initial institutional administrators via an isolated, secure bootstrap command.',
+    );
+  }
+
   console.log('🌱 Starting FixFlow database seeding...');
 
   // 1. Seed Users (Representing all 4 roles with hashed passwords)

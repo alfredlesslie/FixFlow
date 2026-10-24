@@ -1,5 +1,12 @@
 export type UserRole = 'REQUESTER' | 'TECHNICIAN' | 'FACILITY_MANAGER' | 'ADMIN';
 
+export type AccountStatus =
+  | 'PENDING_VERIFICATION'
+  | 'PENDING_APPROVAL'
+  | 'ACTIVE'
+  | 'REJECTED'
+  | 'SUSPENDED';
+
 export type RequestStatus =
   | 'OPEN'
   | 'TRIAGED'
@@ -84,6 +91,8 @@ export interface MaintenanceRequest {
   workOrderId?: string;
   isDuplicate?: boolean;
   duplicateOfId?: string;
+  duplicateOfNumber?: string;
+  duplicateReason?: string;
   mergedDuplicates?: string[]; // IDs of merged child requests
   clarificationRequested?: boolean;
   clarificationMessage?: string;
@@ -166,21 +175,33 @@ export type ApplicationStatus = 'PENDING_REVIEW' | 'APPROVED' | 'REJECTED';
 
 export interface RegistrationApplication {
   id: string;
+  userId?: string | null;
   applicantName: string;
   applicantEmail: string;
   institutionalId: string;
   department: string;
   contactNumber: string;
-  requestedRole: 'TECHNICIAN' | 'FACILITY_MANAGER' | 'REQUESTER';
+  requestedRole: 'TECHNICIAN' | 'FACILITY_MANAGER' | 'REQUESTER' | 'ADMIN';
   emailVerified: boolean;
   status: ApplicationStatus;
-  tradeDiscipline?: string;
-  certificationNumber?: string;
-  yearsExperience?: string;
-  facilityScope?: string;
-  appointmentJustification?: string;
-  rejectionReason?: string;
-  reviewedBy?: string;
-  reviewedAt?: string;
+  tradeDiscipline?: string | null;
+  certificationNumber?: string | null;
+  yearsExperience?: string | null;
+  facilityScope?: string | null;
+  appointmentJustification?: string | null;
+  rejectionReason?: string | null;
+  reviewedById?: string | null;
+  reviewedBy?: string | null;
+  reviewedAt?: string | null;
   submittedAt: string;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface CampusLocation {
+  id: string;
+  name: string;
+  building: string;
+  room?: string;
+  code?: string;
 }

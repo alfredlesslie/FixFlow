@@ -21,9 +21,10 @@ export class AuditResolver {
     @Args('entity', { type: () => String, nullable: true }) entity?: string,
     @Args('limit', { type: () => Int, nullable: true, defaultValue: 50 }) limit?: number,
   ): Promise<AuditLog[]> {
+    const safeLimit = Math.min(Math.max(1, limit ?? 50), 100);
     const logs = await this.prisma.auditLog.findMany({
       where: entity ? { entity } : undefined,
-      take: limit || 50,
+      take: safeLimit,
       orderBy: { timestamp: 'desc' },
     });
 

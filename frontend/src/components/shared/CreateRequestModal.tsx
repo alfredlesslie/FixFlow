@@ -12,11 +12,12 @@ import {
   Tag,
   Sliders,
   CheckCircle2,
+  Loader2,
 } from 'lucide-react';
 import { Modal } from '@/components/ui/Modal';
 import { Button } from '@/components/ui/Button';
 import { useDataBridge } from '@/lib/use-data-bridge';
-import { DuplicateCandidate } from '@/lib/types';
+import { DuplicateCandidate, CampusLocation } from '@/lib/types';
 
 interface CreateRequestModalProps {
   isOpen: boolean;
@@ -35,7 +36,7 @@ const CATEGORIES = [
   'Custodial & Grounds',
 ];
 
-const LOCATIONS = [
+const LOCATIONS: CampusLocation[] = [
   { id: 'loc-lib-2', name: 'Central Library — 2nd Floor Study Commons', building: 'Central Library', room: 'Commons 204' },
   { id: 'loc-dorm-n', name: 'North Quad — Residence Hall B Entrance', building: 'Residence Hall B', room: 'Vestibule' },
   { id: 'loc-eng-4', name: 'Turing Hall — Lecture Hall 402', building: 'Turing Hall', room: 'Hall 402' },
@@ -45,9 +46,9 @@ const LOCATIONS = [
 ];
 
 const PRESET_SAMPLE_PHOTOS = [
+  '/demo-assets/water-leak-evidence.png',
+  '/demo-assets/hvac-compressor-fault.png',
   'https://images.unsplash.com/photo-1584622650111-993a426fbf0a?w=800',
-  'https://images.unsplash.com/photo-1541888946425-d0fbb18086f6?w=800',
-  'https://images.unsplash.com/photo-1517646287270-a5a9ca602e5c?w=800',
 ];
 
 export function CreateRequestModal({
@@ -56,15 +57,28 @@ export function CreateRequestModal({
   onSuccess,
   onSelectExistingIssue,
 }: CreateRequestModalProps) {
-  const { activeUser, createRequest, detectDuplicates, upvoteRequest } = useDataBridge();
+  const { activeUser, createRequest, detectDuplicates, upvoteRequest, locations, uploadAttachment } = useDataBridge();
+
+  const availableLocations: CampusLocation[] = locations && locations.length > 0 ? locations : LOCATIONS;
 
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [category, setCategory] = useState(CATEGORIES[0]);
-  const [locationId, setLocationId] = useState(LOCATIONS[0].id);
+  const [locationId, setLocationId] = useState(availableLocations[0]?.id || LOCATIONS[0].id);
   const [initialSeverity, setInitialSeverity] = useState(5);
   const [images, setImages] = useState<string[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
+  const [uploadError, setUploadError] = useState<string | null>(null);
+  const fileInputRef = React.useRef<HTMLInputElement | null>(null);
+
+  // Synchronize locationId if availableLocations loads after mount
+  useEffect(() => {
+    if (availableLocations.length > 0 && !availableLocations.some((l: CampusLocation) => l.id === locationId)) {
+      setLocationId(availableLocations[0].id);
+    }
+  }, [availableLocations, locationId]);
 
   // Live duplicate detection candidates
   const [duplicateCandidates, setDuplicateCandidates] = useState<DuplicateCandidate[]>([]);
@@ -80,54 +94,90 @@ export function CreateRequestModal({
     }
   }, [title, description, category, locationId, detectDuplicates]);
 
-  const selectedLoc = LOCATIONS.find((l) => l.id === locationId) || LOCATIONS[0];
+  const selectedLoc = availableLocations.find((l) => l.id === locationId) || availableLocations[0];
 
-  const handleUpvoteDuplicateInstead = (candidate: DuplicateCandidate) => {
-    upvoteRequest(candidate.requestId);
-    onClose();
-    if (onSelectExistingIssue) {
-      onSelectExistingIssue(candidate.requestId);
+  const handleUpvoteDuplicateInstead = async (candidate: DuplicateCandidate) => {
+    try {
+      await upvoteRequest(candidate.requestId);
+      onClose();
+      if (onSelectExistingIssue) {
+        onSelectExistingIssue(candidate.requestId);
+      }
+    } catch (err: any) {
+      setSubmitError(err?.message || 'Failed to register upvote');
     }
   };
 
   const handleAddSamplePhoto = (url: string) => {
-    if (!images.includes(url)) {
-      setImages([...images, url]);
-    }
+    setImages((prev) => (!prev.includes(url) ? [...prev, url] : prev));
   };
 
   const handleRemovePhoto = (url: string) => {
     setImages(images.filter((img) => img !== url));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+
+    if (images.length >= 4) {
+      setUploadError('Maximum of 4 photographic evidence attachments allowed.');
+      return;
+    }
+
+    const file = files[0];
+    setUploadError(null);
+
+    // Client-side quick check
+    if (!file.type.startsWith('image/')) {
+      setUploadError('Please select a valid image file (PNG, JPG, WEBP, GIF, SVG).');
+      return;
+    }
+    if (file.size > 10 * 1024 * 1024) {
+      setUploadError('File size exceeds the 10MB maximum limit.');
+      return;
+    }
+
+    setIsUploading(true);
+    try {
+      const res = await uploadAttachment(file);
+      const url = res.fileUrl || `/api/attachments/${res.id}`;
+      setImages((prev) => [...prev, url]);
+    } catch (err: any) {
+      setUploadError(err?.message || 'Server rejected file upload.');
+    } finally {
+      setIsUploading(false);
+      if (fileInputRef.current) fileInputRef.current.value = '';
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!title.trim() || !description.trim()) return;
 
     setIsSubmitting(true);
+    setSubmitError(null);
     try {
-      createRequest({
+      await createRequest({
         title: title.trim(),
         description: description.trim(),
         category,
         locationId: selectedLoc.id,
-        locationName: selectedLoc.name,
-        building: selectedLoc.building,
-        room: selectedLoc.room,
         initialSeverity,
         images,
         user: activeUser,
       });
 
-      // Reset
+      // Reset form
       setTitle('');
       setDescription('');
       setImages([]);
       setIsSubmitting(false);
       onClose();
       if (onSuccess) onSuccess();
-    } catch {
+    } catch (err: any) {
       setIsSubmitting(false);
+      setSubmitError(err?.message || 'Failed to submit request to server');
     }
   };
 
@@ -148,6 +198,23 @@ export function CreateRequestModal({
       subtitle="Submit maintenance notices for campus facilities, equipment, or safety concerns."
     >
       <form onSubmit={handleSubmit} className="space-y-5">
+        {/* Error Banner */}
+        {submitError && (
+          <div className="p-3 rounded-xl bg-rose-50 dark:bg-rose-950/40 border border-rose-300 dark:border-rose-800 text-rose-800 dark:text-rose-200 text-xs flex items-center justify-between gap-2">
+            <div className="flex items-center gap-2">
+              <AlertTriangle className="w-4 h-4 text-rose-500 shrink-0" />
+              <span>{submitError}</span>
+            </div>
+            <button
+              type="button"
+              onClick={() => setSubmitError(null)}
+              className="text-rose-500 hover:text-rose-700 text-xs"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          </div>
+        )}
+
         {/* Live Duplicate Detection Banner */}
         {duplicateCandidates.length > 0 && !dismissDuplicateNotice && (
           <div className="p-4 rounded-xl bg-amber-50 dark:bg-amber-950/40 border border-amber-300 dark:border-amber-800 text-amber-900 dark:text-amber-200 transition-all">
@@ -243,7 +310,7 @@ export function CreateRequestModal({
               onChange={(e) => setLocationId(e.target.value)}
               className="w-full text-xs px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-500"
             >
-              {LOCATIONS.map((loc) => (
+              {availableLocations.map((loc) => (
                 <option key={loc.id} value={loc.id}>
                   {loc.name}
                 </option>
@@ -299,12 +366,22 @@ export function CreateRequestModal({
             <span className="text-[11px] text-slate-400">Optional (up to 4)</span>
           </label>
 
+          {/* Upload Error Banner */}
+          {uploadError && (
+            <div className="mb-2 p-2 rounded-lg bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900 text-rose-700 dark:text-rose-300 text-[11px] flex items-center justify-between">
+              <span>{uploadError}</span>
+              <button type="button" onClick={() => setUploadError(null)} className="text-rose-500 hover:text-rose-700">
+                <X className="w-3.5 h-3.5" />
+              </button>
+            </div>
+          )}
+
           {/* Attached image preview chips */}
           {images.length > 0 && (
             <div className="grid grid-cols-3 gap-2 mb-3">
               {images.map((img, i) => (
-                <div key={i} className="relative h-20 rounded-lg overflow-hidden border border-slate-200 group">
-                  <img src={img} alt="Attached" className="w-full h-full object-cover" />
+                <div key={i} className="relative h-20 rounded-lg overflow-hidden border border-slate-200 dark:border-slate-800 bg-slate-100 dark:bg-slate-900 group">
+                  <img src={img} alt="Attached Evidence" className="w-full h-full object-cover" />
                   <button
                     type="button"
                     onClick={() => handleRemovePhoto(img)}
@@ -317,9 +394,35 @@ export function CreateRequestModal({
             </div>
           )}
 
-          {/* Demo preset photo buttons */}
-          <div className="flex items-center gap-2">
-            <span className="text-[11px] text-slate-400">Attach sample photo:</span>
+          {/* Real File Upload & Sample Controls */}
+          <div className="flex flex-wrap items-center gap-2">
+            <input
+              type="file"
+              ref={fileInputRef}
+              onChange={handleFileSelect}
+              accept="image/png,image/jpeg,image/webp,image/gif,image/svg+xml"
+              className="hidden"
+            />
+            <button
+              type="button"
+              disabled={isUploading || images.length >= 4}
+              onClick={() => fileInputRef.current?.click()}
+              className="text-xs font-medium px-3 py-1.5 rounded-lg bg-sky-50 dark:bg-sky-950/50 hover:bg-sky-100 dark:hover:bg-sky-900/50 text-sky-700 dark:text-sky-300 border border-sky-200 dark:border-sky-800 flex items-center gap-1.5 disabled:opacity-50 transition-colors"
+            >
+              {isUploading ? (
+                <>
+                  <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                  <span>Uploading...</span>
+                </>
+              ) : (
+                <>
+                  <Upload className="w-3.5 h-3.5" />
+                  <span>Upload Real Photo</span>
+                </>
+              )}
+            </button>
+
+            <span className="text-[11px] text-slate-400">or sample:</span>
             {PRESET_SAMPLE_PHOTOS.map((photo, i) => (
               <button
                 key={i}

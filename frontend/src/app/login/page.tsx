@@ -23,19 +23,26 @@ import {
 
 export default function LoginPage() {
   const router = useRouter();
-  const { login, isAuthenticated, user } = useAuth();
+  const { login, isAuthenticated, user, loading: authLoading } = useAuth();
 
-  const [email, setEmail] = useState('manager@fixflow.edu');
-  const [password, setPassword] = useState('Manager@123');
+  const isDevOrTest = process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'test';
+  const [email, setEmail] = useState(isDevOrTest ? 'manager@fixflow.edu' : '');
+  const [password, setPassword] = useState(isDevOrTest ? 'Manager@123' : '');
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   // If already logged in, redirect straight to their authorized portal
   useEffect(() => {
-    if (isAuthenticated && user) {
-      router.replace(getRoleRedirectPath(user.role));
+    if (!authLoading && isAuthenticated && user && user.role) {
+      if (user.status === 'REJECTED') {
+        router.replace(
+          `/pending-approval?status=rejected&email=${encodeURIComponent(user.email)}&role=${user.role}&name=${encodeURIComponent(user.name)}`
+        );
+      } else if (user.status === 'ACTIVE' || !user.status) {
+        router.replace(getRoleRedirectPath(user.role));
+      }
     }
-  }, [isAuthenticated, user, router]);
+  }, [authLoading, isAuthenticated, user, router]);
 
   const presets = [
     {
@@ -89,8 +96,14 @@ export default function LoginPage() {
 
     try {
       const authUser = await login(email, password);
-      const targetPath = getRoleRedirectPath(authUser.role);
-      router.push(targetPath);
+      if (authUser.status === 'REJECTED') {
+        router.push(
+          `/pending-approval?status=rejected&email=${encodeURIComponent(authUser.email)}&role=${authUser.role}&name=${encodeURIComponent(authUser.name)}`
+        );
+      } else {
+        const targetPath = getRoleRedirectPath(authUser.role);
+        router.push(targetPath);
+      }
     } catch (err: any) {
       setErrorMsg(err.message || 'Authentication failed. Please verify institutional credentials.');
     } finally {
@@ -226,40 +239,42 @@ export default function LoginPage() {
             </Link>
           </div>
 
-          {/* Quick-Fill Presets for Demonstration */}
-          <div className="pt-4 border-t border-slate-200 dark:border-slate-800 space-y-3">
-            <div className="flex items-center justify-between">
-              <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
-                Institutional Accounts
-              </span>
-              <span className="text-[10px] text-slate-400 dark:text-slate-500">Tap to populate</span>
-            </div>
+          {/* Quick-Fill Presets for Demonstration (Restricted to development/test only) */}
+          {isDevOrTest && (
+            <div className="pt-4 border-t border-slate-200 dark:border-slate-800 space-y-3">
+              <div className="flex items-center justify-between">
+                <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                  Institutional Accounts
+                </span>
+                <span className="text-[10px] text-slate-400 dark:text-slate-500">Tap to populate</span>
+              </div>
 
-            <div className="grid grid-cols-2 gap-2">
-              {presets.map((p) => {
-                const isSelected = email === p.email;
-                return (
-                  <button
-                    key={p.role}
-                    type="button"
-                    onClick={() => handleSelectPreset(p)}
-                    className={`text-left p-2.5 rounded-xl border transition-all haptic-press ${
-                      isSelected
-                        ? 'bg-sky-50 dark:bg-slate-800 border-sky-500 text-slate-900 dark:text-white shadow-sm'
-                        : 'bg-slate-50/70 dark:bg-slate-950/70 border-slate-200 dark:border-slate-800/80 text-slate-700 dark:text-slate-300 ' + p.border
-                    }`}
-                  >
-                    <div className="flex items-center gap-1.5 font-bold text-xs text-slate-900 dark:text-white">
-                      {p.icon}
-                      <span>{p.label}</span>
-                    </div>
-                    <div className="text-[10px] text-slate-500 dark:text-slate-400 truncate mt-0.5">{p.email}</div>
-                    <div className="text-[9px] text-slate-400 dark:text-slate-500 mt-1">{p.badge}</div>
-                  </button>
-                );
-              })}
+              <div className="grid grid-cols-2 gap-2">
+                {presets.map((p) => {
+                  const isSelected = email === p.email;
+                  return (
+                    <button
+                      key={p.role}
+                      type="button"
+                      onClick={() => handleSelectPreset(p)}
+                      className={`text-left p-2.5 rounded-xl border transition-all haptic-press ${
+                        isSelected
+                          ? 'bg-sky-50 dark:bg-slate-800 border-sky-500 text-slate-900 dark:text-white shadow-sm'
+                          : 'bg-slate-50/70 dark:bg-slate-950/70 border-slate-200 dark:border-slate-800/80 text-slate-700 dark:text-slate-300 ' + p.border
+                      }`}
+                    >
+                      <div className="flex items-center gap-1.5 font-bold text-xs text-slate-900 dark:text-white">
+                        {p.icon}
+                        <span>{p.label}</span>
+                      </div>
+                      <div className="text-[10px] text-slate-500 dark:text-slate-400 truncate mt-0.5">{p.email}</div>
+                      <div className="text-[9px] text-slate-400 dark:text-slate-500 mt-1">{p.badge}</div>
+                    </button>
+                  );
+                })}
+              </div>
             </div>
-          </div>
+          )}
         </div>
 
         <div className="text-center">

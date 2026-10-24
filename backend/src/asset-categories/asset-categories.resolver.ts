@@ -19,6 +19,7 @@ export class AssetCategoriesResolver {
     name: 'assetCategories',
     description: 'Retrieve all asset classification categories',
   })
+  @UseGuards(GqlAuthGuard)
   async getCategories(): Promise<AssetCategory[]> {
     return this.categoriesService.findAll();
   }
@@ -27,6 +28,7 @@ export class AssetCategoriesResolver {
     name: 'assetCategory',
     description: 'Retrieve details of a single category by ID',
   })
+  @UseGuards(GqlAuthGuard)
   async getCategory(@Args('id', { type: () => ID }) id: string): Promise<AssetCategory> {
     return this.categoriesService.findById(id);
   }

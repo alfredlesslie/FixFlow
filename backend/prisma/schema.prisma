@@ -16,6 +16,20 @@ enum Role {
   ADMIN
 }
 
+enum AccountStatus {
+  PENDING_VERIFICATION
+  PENDING_APPROVAL
+  ACTIVE
+  REJECTED
+  SUSPENDED
+}
+
+enum ApplicationStatus {
+  PENDING_REVIEW
+  APPROVED
+  REJECTED
+}
+
 enum AssetStatus {
   OPERATIONAL
   UNDER_MAINTENANCE
@@ -65,28 +79,90 @@ enum ScheduleStatus {
 }
 
 model User {
-  id           String   @id @default(uuid())
-  email        String   @unique
-  passwordHash String
-  firstName    String
-  lastName     String
-  role         Role     @default(REQUESTER)
-  department   String?
-  phone        String?
-  isActive     Boolean  @default(true)
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  id              String        @id @default(uuid())
+  email           String        @unique
+  passwordHash    String
+  firstName       String
+  lastName        String
+  role            Role          @default(REQUESTER)
+  status          AccountStatus @default(PENDING_VERIFICATION)
+  tokenVersion    Int           @default(0)
+  emailVerified   Boolean       @default(false)
+  emailVerifiedAt DateTime?
+  institutionalId String?
+  department      String?
+  phone           String?
+  isActive        Boolean       @default(true)
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
 
-  createdRequests    MaintenanceRequest[] @relation("UserCreatedRequests")
-  assignedWorkOrders WorkOrder[]          @relation("TechnicianWorkOrders")
-  maintenanceRecords MaintenanceRecord[]  @relation("TechnicianRecords")
-  auditLogs          AuditLog[]           @relation("UserAuditLogs")
-  comments           Comment[]            @relation("UserComments")
-  attachments        Attachment[]         @relation("UserAttachments")
-  notifications      Notification[]       @relation("UserNotifications")
+  createdRequests          MaintenanceRequest[]      @relation("UserCreatedRequests")
+  assignedWorkOrders       WorkOrder[]               @relation("TechnicianWorkOrders")
+  maintenanceRecords       MaintenanceRecord[]       @relation("TechnicianRecords")
+  auditLogs                AuditLog[]                @relation("UserAuditLogs")
+  comments                 Comment[]                 @relation("UserComments")
+  attachments              Attachment[]              @relation("UserAttachments")
+  notifications            Notification[]            @relation("UserNotifications")
+  emailVerificationTokens  EmailVerificationToken[]
+  registrationApplications RegistrationApplication[] @relation("UserApplications")
+  reviewedApplications     RegistrationApplication[] @relation("AdminReviewedApplications")
+  handoversFrom            WorkOrderHandover[]       @relation("HandoverFromTechnician")
+  handoversTo              WorkOrderHandover[]       @relation("HandoverToTechnician")
+  votes                    RequestVote[]             @relation("UserVotes")
+  markedDuplicates         RequestDuplicate[]        @relation("UserMarkedDuplicates")
 
   @@index([role])
   @@index([email])
+  @@index([status])
+}
+
+model RegistrationApplication {
+  id                       String            @id @default(uuid())
+  userId                   String?
+  applicantName            String
+  applicantEmail           String
+  institutionalId          String
+  department               String
+  contactNumber            String
+  requestedRole            Role
+  status                   ApplicationStatus @default(PENDING_REVIEW)
+  emailVerified            Boolean           @default(false)
+  tradeDiscipline          String?
+  certificationNumber      String?
+  yearsExperience          String?
+  facilityScope            String?
+  appointmentJustification String?
+  rejectionReason          String?
+  reviewedById             String?
+  reviewedAt               DateTime?
+  submittedAt              DateTime          @default(now())
+  createdAt                DateTime          @default(now())
+  updatedAt                DateTime          @updatedAt
+
+  user       User? @relation("UserApplications", fields: [userId], references: [id], onDelete: SetNull)
+  reviewedBy User? @relation("AdminReviewedApplications", fields: [reviewedById], references: [id], onDelete: SetNull)
+
+  @@index([status])
+  @@index([applicantEmail])
+  @@index([requestedRole])
+  @@index([submittedAt])
+  @@index([userId])
+  @@index([reviewedById])
+}
+
+model EmailVerificationToken {
+  id        String    @id @default(uuid())
+  tokenHash String    @unique
+  userId    String
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([expiresAt])
+  @@index([tokenHash])
 }
 
 model Location {
@@ -100,7 +176,8 @@ model Location {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  assets Asset[]
+  assets              Asset[]
+  maintenanceRequests MaintenanceRequest[]
 
   @@index([building])
   @@index([code])
@@ -119,23 +196,23 @@ model AssetCategory {
 }
 
 model Asset {
-  id              String      @id @default(uuid())
-  assetTag        String      @unique
-  name            String
-  description     String?
-  categoryId      String
-  locationId      String
-  status          AssetStatus @default(OPERATIONAL)
-  criticality     Criticality @default(MEDIUM)
-  conditionRating Int         @default(5) // 1 (Critical) to 5 (Excellent)
-  serialNumber    String?
-  manufacturer    String?
-  model           String?
+  id               String      @id @default(uuid())
+  assetTag         String      @unique
+  name             String
+  description      String?
+  categoryId       String
+  locationId       String
+  status           AssetStatus @default(OPERATIONAL)
+  criticality      Criticality @default(MEDIUM)
+  conditionRating  Int         @default(5) // 1 (Critical) to 5 (Excellent)
+  serialNumber     String?
+  manufacturer     String?
+  model            String?
   installationDate DateTime?
-  warrantyExpiry  DateTime?
-  qrIdentifier    String      @unique
-  createdAt       DateTime    @default(now())
-  updatedAt       DateTime    @updatedAt
+  warrantyExpiry   DateTime?
+  qrIdentifier     String      @unique
+  createdAt        DateTime    @default(now())
+  updatedAt        DateTime    @updatedAt
 
   category             AssetCategory         @relation(fields: [categoryId], references: [id])
   location             Location              @relation(fields: [locationId], references: [id])
@@ -157,7 +234,8 @@ model MaintenanceRequest {
   title             String
   description       String
   requesterId       String
-  assetId           String
+  locationId        String
+  assetId           String?
   priority          Priority      @default(MEDIUM)
   status            RequestStatus @default(OPEN)
   slaTargetHours    Int           @default(24)
@@ -171,14 +249,19 @@ model MaintenanceRequest {
   updatedAt         DateTime      @updatedAt
 
   requester   User         @relation("UserCreatedRequests", fields: [requesterId], references: [id])
-  asset       Asset        @relation(fields: [assetId], references: [id])
+  location    Location     @relation(fields: [locationId], references: [id])
+  asset       Asset?       @relation(fields: [assetId], references: [id])
   workOrder   WorkOrder?
   comments    Comment[]
   attachments Attachment[]
+  votes       RequestVote[]
+  duplicateOfLinks         RequestDuplicate[] @relation("OriginalRequests")
+  duplicateLinkAsDuplicate RequestDuplicate?  @relation("DuplicateRequests")
 
   @@index([status])
   @@index([priority])
   @@index([requesterId])
+  @@index([locationId])
   @@index([assetId])
   @@index([slaDeadline])
 }
@@ -187,7 +270,7 @@ model WorkOrder {
   id                String          @id @default(uuid())
   orderNumber       String          @unique
   requestId         String          @unique
-  assetId           String
+  assetId           String?
   technicianId      String?
   status            WorkOrderStatus @default(PENDING)
   instructions      String?
@@ -202,27 +285,47 @@ model WorkOrder {
   updatedAt         DateTime        @updatedAt
 
   request     MaintenanceRequest  @relation(fields: [requestId], references: [id], onDelete: Cascade)
-  asset       Asset               @relation(fields: [assetId], references: [id])
+  asset       Asset?              @relation(fields: [assetId], references: [id])
   technician  User?               @relation("TechnicianWorkOrders", fields: [technicianId], references: [id])
   records     MaintenanceRecord[]
   attachments Attachment[]
+  handovers   WorkOrderHandover[]
 
   @@index([status])
   @@index([technicianId])
   @@index([assetId])
 }
 
+model WorkOrderHandover {
+  id             String   @id @default(uuid())
+  workOrderId    String
+  previousTechId String?
+  nextTechId     String
+  handoverNotes  String
+  reason         String?
+  createdAt      DateTime @default(now())
+
+  workOrder    WorkOrder @relation(fields: [workOrderId], references: [id], onDelete: Cascade)
+  previousTech User?     @relation("HandoverFromTechnician", fields: [previousTechId], references: [id], onDelete: SetNull)
+  nextTech     User      @relation("HandoverToTechnician", fields: [nextTechId], references: [id])
+
+  @@index([workOrderId])
+  @@index([previousTechId])
+  @@index([nextTechId])
+  @@index([createdAt])
+}
+
 model MaintenanceSchedule {
-  id                String   @id @default(uuid())
+  id                String    @id @default(uuid())
   title             String
   description       String?
   assetId           String
   frequencyDays     Int
   lastCompletedDate DateTime?
   nextDueDate       DateTime
-  isEnabled         Boolean  @default(true)
-  createdAt         DateTime @default(now())
-  updatedAt         DateTime @updatedAt
+  isEnabled         Boolean   @default(true)
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
 
   asset Asset @relation(fields: [assetId], references: [id], onDelete: Cascade)
 
@@ -275,6 +378,8 @@ model Attachment {
   fileUrl     String
   fileType    String
   fileSize    Int
+  storageKey  String?
+  mimeType    String?
   createdAt   DateTime @default(now())
 
   request   MaintenanceRequest? @relation(fields: [requestId], references: [id], onDelete: Cascade)
@@ -314,4 +419,35 @@ model Notification {
   user User @relation("UserNotifications", fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId, isRead])
+}
+
+model RequestVote {
+  id        String   @id @default(uuid())
+  requestId String
+  userId    String
+  createdAt DateTime @default(now())
+
+  request MaintenanceRequest @relation(fields: [requestId], references: [id], onDelete: Cascade)
+  user    User               @relation("UserVotes", fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([requestId, userId])
+  @@index([requestId])
+  @@index([userId])
+}
+
+model RequestDuplicate {
+  id                 String   @id @default(uuid())
+  originalRequestId  String
+  duplicateRequestId String   @unique
+  markedById         String
+  reason             String?
+  createdAt          DateTime @default(now())
+
+  originalRequest  MaintenanceRequest @relation("OriginalRequests", fields: [originalRequestId], references: [id], onDelete: Cascade)
+  duplicateRequest MaintenanceRequest @relation("DuplicateRequests", fields: [duplicateRequestId], references: [id], onDelete: Cascade)
+  markedBy         User               @relation("UserMarkedDuplicates", fields: [markedById], references: [id])
+
+  @@index([originalRequestId])
+  @@index([duplicateRequestId])
+  @@index([markedById])
 }

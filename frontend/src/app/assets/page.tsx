@@ -194,6 +194,8 @@ export default function AssetsPage() {
         criticality: selectedCriticality || undefined,
       },
     },
+    skip: !user,
+    fetchPolicy: 'cache-and-network',
     errorPolicy: 'ignore',
     pollInterval: 15000,
   });

@@ -7,7 +7,7 @@ import { FacilityManagerCommandCenter } from '@/components/roles/FacilityManager
 
 export default function ManagerPage() {
   return (
-    <ProtectedRoute allowedRoles={['FACILITY_MANAGER', 'ADMIN']}>
+    <ProtectedRoute allowedRoles={['FACILITY_MANAGER']}>
       <AppShell>
         <FacilityManagerCommandCenter />
       </AppShell>

@@ -23,6 +23,8 @@ coverage/
 out/
 build/
 dist/
+backend/dist/
+frontend/dist/
 *.tsbuildinfo
 
 # Local Database & Embedded PostgreSQL Cluster Data
@@ -30,6 +32,15 @@ dist/
 backend/.postgres-data/
 /backend/prisma/*.db
 /backend/prisma/*.db-journal
+backend/prisma/backups/
+*.dump
+
+# Local Media & Runtime Uploads
+uploads/*
+!uploads/.gitkeep
+backend/uploads/*
+!backend/uploads/.gitkeep
+!backend/assets/
 
 # Environment Configuration Files
 .env
@@ -44,10 +55,16 @@ backend/.postgres-data/
 !**/.env*.example
 
 # Debug Logs
+*.log
+**/*.log
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
+
+# Local Archives & Temporary Exports
+*-local-archive/
+*archive*/
 
 # Misc & System Files
 .DS_Store

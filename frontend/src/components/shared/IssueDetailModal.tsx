@@ -1,6 +1,7 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
+import { useQuery } from '@apollo/client';
 import {
   ThumbsUp,
   Clock,
@@ -21,8 +22,9 @@ import {
 import { Modal } from '@/components/ui/Modal';
 import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
-import { MaintenanceRequest, RequestStatus, UserRole } from '@/lib/types';
+import { MaintenanceRequest, RequestComment, RequestStatus, UserRole } from '@/lib/types';
 import { useDataBridge } from '@/lib/use-data-bridge';
+import { GET_COMMENTS_QUERY } from '@/lib/graphql-operations';
 
 interface IssueDetailModalProps {
   request: MaintenanceRequest | null;
@@ -49,24 +51,66 @@ export function IssueDetailModal({
   onOpenWorkOrder,
   onOpenPriorityOverride,
 }: IssueDetailModalProps) {
-  const { activeUser, upvoteRequest, addComment } = useDataBridge();
+  const { activeUser, upvoteRequest, removeUpvote, unmarkRequestDuplicate, addComment } = useDataBridge();
   const [commentInput, setCommentInput] = useState('');
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
+
+  const { data: commentsData, refetch: refetchComments } = useQuery(GET_COMMENTS_QUERY, {
+    variables: { requestId: request?.id },
+    skip: !request?.id,
+    fetchPolicy: 'cache-and-network',
+  });
+
+  const commentsList: RequestComment[] = useMemo(() => {
+    if (commentsData?.comments && commentsData.comments.length > 0) {
+      return commentsData.comments.map((c: any) => ({
+        id: c.id,
+        authorId: c.authorId,
+        authorName: c.author?.name || 'Staff User',
+        authorRole: (c.author?.role as UserRole) || 'REQUESTER',
+        content: c.content,
+        createdAt: c.createdAt,
+        isInternal: c.isInternal,
+      }));
+    }
+    return request?.comments || [];
+  }, [commentsData, request?.comments]);
 
   if (!request) return null;
 
   const isUpvoted = request.upvoters.includes(activeUser.id);
   const currentStepIndex = LIFECYCLE_STEPS.indexOf(request.status);
 
-  const handleUpvote = () => {
-    upvoteRequest(request.id);
+  const handleUpvote = async () => {
+    try {
+      if (isUpvoted) {
+        await removeUpvote(request.id);
+      } else {
+        await upvoteRequest(request.id);
+      }
+    } catch (err) {
+      console.error('Failed to update upvote:', err);
+    }
   };
 
-  const handleSendComment = (e: React.FormEvent) => {
+  const handleUnlinkDuplicate = async () => {
+    try {
+      await unmarkRequestDuplicate(request.id);
+    } catch (err) {
+      console.error('Failed to unlink duplicate:', err);
+    }
+  };
+
+  const handleSendComment = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!commentInput.trim()) return;
-    addComment(request.id, commentInput.trim());
-    setCommentInput('');
+    try {
+      await addComment(request.id, commentInput.trim());
+      setCommentInput('');
+      await refetchComments();
+    } catch (err) {
+      console.error('Failed to submit comment:', err);
+    }
   };
 
   return (
@@ -156,6 +200,39 @@ export function IssueDetailModal({
             )}
           </div>
         </div>
+
+        {/* Duplicate Notice Banner */}
+        {request.isDuplicate && (
+          <div className="p-4 rounded-xl bg-amber-50 dark:bg-amber-950/40 border border-amber-300 dark:border-amber-800 text-amber-900 dark:text-amber-200">
+            <div className="flex items-start justify-between gap-3">
+              <div className="flex items-start gap-2.5">
+                <AlertTriangle className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
+                <div>
+                  <h4 className="text-xs font-bold uppercase tracking-wider">
+                    Official Duplicate Notice
+                  </h4>
+                  <p className="text-xs text-amber-800 dark:text-amber-300 mt-0.5 leading-snug">
+                    This request is linked as a duplicate of primary ticket <strong className="font-mono">#{request.duplicateOfNumber || request.duplicateOfId}</strong>.
+                  </p>
+                  {request.duplicateReason && (
+                    <p className="text-[11px] text-amber-700/90 dark:text-amber-400/90 mt-1 italic">
+                      Justification: {request.duplicateReason}
+                    </p>
+                  )}
+                </div>
+              </div>
+              {(activeUser.role === 'FACILITY_MANAGER' || activeUser.role === 'ADMIN' || activeUser.role === 'TECHNICIAN') && (
+                <button
+                  type="button"
+                  onClick={handleUnlinkDuplicate}
+                  className="text-xs font-semibold px-2.5 py-1 rounded bg-amber-100 hover:bg-amber-200 dark:bg-amber-900/60 dark:hover:bg-amber-800 text-amber-900 dark:text-amber-100 border border-amber-300 dark:border-amber-700 transition-colors shrink-0"
+                >
+                  Unlink Duplicate
+                </button>
+              )}
+            </div>
+          </div>
+        )}
 
         {/* 7-Step Lifecycle Horizontal Stepper */}
         <div className="p-4 rounded-xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800">
@@ -303,16 +380,16 @@ export function IssueDetailModal({
         <div className="border-t border-slate-100 dark:border-slate-800 pt-5">
           <h3 className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3 flex items-center gap-1.5">
             <MessageSquare className="w-3.5 h-3.5" />
-            Activity Log & Discussion ({request.comments.length})
+            Activity Log & Discussion ({commentsList.length})
           </h3>
 
           <div className="space-y-3 mb-4 max-h-60 overflow-y-auto pr-1">
-            {request.comments.length === 0 ? (
+            {commentsList.length === 0 ? (
               <p className="text-xs text-slate-400 italic">
                 No comments or updates yet.
               </p>
             ) : (
-              request.comments.map((comm) => (
+              commentsList.map((comm) => (
                 <div
                   key={comm.id}
                   className={`p-3 rounded-xl border text-xs ${

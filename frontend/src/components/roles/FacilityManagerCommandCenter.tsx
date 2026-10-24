@@ -54,10 +54,15 @@ export function FacilityManagerCommandCenter() {
   const [dispatchTechId, setDispatchTechId] = useState('');
   const [dispatchSlaHours, setDispatchSlaHours] = useState(4);
 
-  // Verification Modal
+  // Verification Modal & Feedback
   const [verificationOrder, setVerificationOrder] = useState<WorkOrder | null>(null);
   const [rejectionReason, setRejectionReason] = useState('');
   const [showRejectForm, setShowRejectForm] = useState(false);
+  const [verificationFeedback, setVerificationFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
+  const [isVerifying, setIsVerifying] = useState<boolean>(false);
+
+  // Critical / High Severity filter toggle
+  const [severityFilterOnly, setSeverityFilterOnly] = useState<boolean>(false);
 
   // Duplicate Merge Modal
   const [mergePrimaryRequest, setMergePrimaryRequest] = useState<MaintenanceRequest | null>(null);
@@ -66,13 +71,23 @@ export function FacilityManagerCommandCenter() {
   const technicians = users.filter((u) => u.role === 'TECHNICIAN' && u.active);
 
   // Filter queues
-  const triageQueue = requests.filter(
+  const baseTriageQueue = requests.filter(
     (r) => r.status === 'OPEN' || r.status === 'TRIAGED' || r.status === 'REOPENED'
   );
+  const triageQueue = severityFilterOnly
+    ? baseTriageQueue.filter((r) => r.priority === 'CRITICAL' || r.priority === 'HIGH')
+    : baseTriageQueue;
 
-  const verificationQueue = workOrders.filter(
+  const baseVerificationQueue = workOrders.filter(
     (w) => w.status === 'COMPLETED' && w.verificationStatus === 'PENDING'
   );
+  const verificationQueue = severityFilterOnly
+    ? baseVerificationQueue.filter((w) => w.priority === 'CRITICAL' || w.priority === 'HIGH')
+    : baseVerificationQueue;
+
+  const displayedWorkOrders = severityFilterOnly
+    ? workOrders.filter((w) => w.priority === 'CRITICAL' || w.priority === 'HIGH')
+    : workOrders;
 
   // Priority override submit
   const handleSavePriorityOverride = () => {
@@ -95,14 +110,38 @@ export function FacilityManagerCommandCenter() {
   };
 
   // Verification submit
-  const handleVerify = (approved: boolean) => {
-    if (!verificationOrder) return;
-    if (!approved && !rejectionReason.trim()) return;
+  const handleVerify = async (order: WorkOrder, approved: boolean, reasonNotes?: string) => {
+    setVerificationFeedback(null);
+    setIsVerifying(true);
+    try {
+      const notes = (reasonNotes ?? rejectionReason).trim();
+      if (!approved && !notes) {
+        setVerificationFeedback({
+          type: 'error',
+          message: 'A rejection reason is required before returning a work order for rework.',
+        });
+        setIsVerifying(false);
+        return;
+      }
 
-    verifyWorkOrder(verificationOrder.id, approved, rejectionReason.trim());
-    setVerificationOrder(null);
-    setRejectionReason('');
-    setShowRejectForm(false);
+      await verifyWorkOrder(order.id, approved, notes);
+      setVerificationFeedback({
+        type: 'success',
+        message: approved
+          ? `Work Order ${order.orderNumber} successfully verified and closed.`
+          : `Work Order ${order.orderNumber} returned to technician for rework.`,
+      });
+      setVerificationOrder(null);
+      setRejectionReason('');
+      setShowRejectForm(false);
+    } catch (err: any) {
+      setVerificationFeedback({
+        type: 'error',
+        message: err?.message || 'Verification action failed. Please ensure the work order is in COMPLETED status.',
+      });
+    } finally {
+      setIsVerifying(false);
+    }
   };
 
   // Merge submit
@@ -208,19 +247,81 @@ export function FacilityManagerCommandCenter() {
           </div>
         </div>
 
-        <div className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800">
+        <div
+          role="button"
+          tabIndex={0}
+          aria-pressed={severityFilterOnly}
+          onClick={() => setSeverityFilterOnly((prev) => !prev)}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault();
+              setSeverityFilterOnly((prev) => !prev);
+            }
+          }}
+          className={`p-4 rounded-2xl border transition-all cursor-pointer double-bezel-interactive focus:outline-none focus:ring-2 focus:ring-rose-500/50 ${
+            severityFilterOnly
+              ? 'bg-rose-50/80 dark:bg-rose-950/50 border-rose-400 dark:border-rose-700 ring-2 ring-rose-500/40 shadow-sm'
+              : 'bg-white dark:bg-slate-900 border-slate-200/80 dark:border-slate-800 hover:border-rose-300'
+          }`}
+        >
           <div className="flex items-center justify-between text-xs text-slate-500 font-medium">
-            <span>Critical / High Severity</span>
-            <Flame className="w-3.5 h-3.5 text-rose-500" />
+            <span className={severityFilterOnly ? 'font-bold text-rose-700 dark:text-rose-300' : ''}>
+              Critical / High Severity
+            </span>
+            <div className="flex items-center gap-1.5">
+              {severityFilterOnly && (
+                <span className="text-[10px] bg-rose-200 dark:bg-rose-900/80 text-rose-800 dark:text-rose-200 px-1.5 py-0.5 rounded-full font-bold">
+                  Active Filter
+                </span>
+              )}
+              <Flame className={`w-3.5 h-3.5 ${severityFilterOnly ? 'text-rose-600 animate-pulse' : 'text-rose-500'}`} />
+            </div>
           </div>
           <div className="flex items-baseline justify-between mt-2">
             <span className="text-2xl font-bold text-rose-600 dark:text-rose-400 tabular-data">
               {analytics.criticalOrHigh}
             </span>
-            <span className="text-[11px] text-rose-600 font-semibold">Priority 1 & 2</span>
+            <span className="text-[11px] text-rose-600 font-semibold">
+              {severityFilterOnly ? 'Click to show all' : 'Priority 1 & 2'}
+            </span>
           </div>
         </div>
       </div>
+
+      {/* Global Action Feedback Banners */}
+      {verificationFeedback && (
+        <div
+          className={`p-3.5 rounded-xl border flex items-center justify-between text-xs ${
+            verificationFeedback.type === 'success'
+              ? 'bg-emerald-50 dark:bg-emerald-950/40 border-emerald-200 dark:border-emerald-800 text-emerald-800 dark:text-emerald-200'
+              : 'bg-rose-50 dark:bg-rose-950/40 border-rose-200 dark:border-rose-800 text-rose-800 dark:text-rose-200'
+          }`}
+        >
+          <span className="font-medium">{verificationFeedback.message}</span>
+          <button
+            onClick={() => setVerificationFeedback(null)}
+            className="text-[11px] underline hover:no-underline ml-4"
+          >
+            Dismiss
+          </button>
+        </div>
+      )}
+
+      {/* Active Severity Filter Banner */}
+      {severityFilterOnly && (
+        <div className="flex items-center justify-between p-3 rounded-xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900 text-xs text-rose-800 dark:text-rose-200">
+          <span className="flex items-center gap-2">
+            <Flame className="w-4 h-4 text-rose-600" />
+            Showing <strong>Critical & High Priority</strong> items only.
+          </span>
+          <button
+            onClick={() => setSeverityFilterOnly(false)}
+            className="font-semibold underline hover:no-underline text-rose-700 dark:text-rose-300 ml-4"
+          >
+            Clear Severity Filter
+          </button>
+        </div>
+      )}
 
       {/* Tabs Row */}
       <div className="flex items-center gap-2 border-b border-slate-200 dark:border-slate-800 pb-2">
@@ -457,7 +558,9 @@ export function FacilityManagerCommandCenter() {
                   <Button
                     size="sm"
                     variant="danger"
+                    disabled={isVerifying}
                     onClick={() => {
+                      setVerificationFeedback(null);
                       setVerificationOrder(wo);
                       setShowRejectForm(true);
                     }}
@@ -468,13 +571,11 @@ export function FacilityManagerCommandCenter() {
                   <Button
                     size="sm"
                     variant="success"
-                    onClick={() => {
-                      setVerificationOrder(wo);
-                      handleVerify(true);
-                    }}
+                    disabled={isVerifying}
+                    onClick={() => handleVerify(wo, true)}
                     icon={<Check className="w-3.5 h-3.5" />}
                   >
-                    Verify & Close Case
+                    {isVerifying ? 'Verifying...' : 'Verify & Close Case'}
                   </Button>
                 </div>
               </div>
@@ -486,7 +587,7 @@ export function FacilityManagerCommandCenter() {
       {/* TAB 3: ALL WORK ORDERS */}
       {activeTab === 'work_orders' && (
         <div className="space-y-3">
-          {workOrders.map((wo) => (
+          {displayedWorkOrders.map((wo) => (
             <div
               key={wo.id}
               className="p-4 rounded-xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs"
@@ -670,10 +771,14 @@ export function FacilityManagerCommandCenter() {
               </Button>
               <Button
                 variant="danger"
-                disabled={!rejectionReason.trim()}
-                onClick={() => handleVerify(false)}
+                disabled={!rejectionReason.trim() || isVerifying}
+                onClick={() => {
+                  if (verificationOrder) {
+                    handleVerify(verificationOrder, false, rejectionReason);
+                  }
+                }}
               >
-                Submit Rejection
+                {isVerifying ? 'Submitting...' : 'Submit Rejection'}
               </Button>
             </div>
           </div>

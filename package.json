@@ -18,7 +18,10 @@
     "db:start": "npm run db:start --workspace=backend",
     "db:generate": "npm run prisma:generate --workspace=backend",
     "db:migrate": "npm run prisma:migrate --workspace=backend",
-    "db:seed": "npm run prisma:seed --workspace=backend"
+    "db:seed": "npm run prisma:seed --workspace=backend",
+    "seed:demo": "npm run seed:demo --workspace=backend",
+    "bootstrap:admin": "npm run bootstrap:admin --workspace=backend",
+    "reset:demo-passwords": "npm run reset:demo-passwords --workspace=backend"
   },
   "keywords": [
     "asset-management",
@@ -31,5 +34,8 @@
     "postgresql"
   ],
   "author": "FixFlow Engineering Team",
-  "license": "UNLICENSED"
+  "license": "UNLICENSED",
+  "devDependencies": {
+    "@playwright/test": "^1.64.1"
+  }
 }

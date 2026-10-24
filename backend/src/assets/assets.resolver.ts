@@ -20,6 +20,7 @@ export class AssetsResolver {
     name: 'assets',
     description: 'Retrieve campus assets with multi-criteria filtering and text search',
   })
+  @UseGuards(GqlAuthGuard)
   async getAssets(
     @Args('filter', { type: () => AssetFilterInput, nullable: true })
     filter?: AssetFilterInput,
@@ -31,6 +32,7 @@ export class AssetsResolver {
     name: 'asset',
     description: 'Retrieve complete asset details by unique ID',
   })
+  @UseGuards(GqlAuthGuard)
   async getAsset(@Args('id', { type: () => ID }) id: string): Promise<Asset> {
     return this.assetsService.findById(id);
   }
@@ -39,6 +41,7 @@ export class AssetsResolver {
     name: 'assetByTag',
     description: 'Lookup an asset by its institutional asset tag (supports QR destination)',
   })
+  @UseGuards(GqlAuthGuard)
   async getAssetByTag(
     @Args('assetTag', { type: () => String }) assetTag: string,
   ): Promise<Asset> {

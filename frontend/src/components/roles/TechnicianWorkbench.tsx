@@ -499,7 +499,7 @@ export function TechnicianWorkbench() {
                         key={i}
                         type="button"
                         onClick={() => {
-                          if (!afterImages.includes(photo)) setAfterImages([...afterImages, photo]);
+                          setAfterImages((prev) => (!prev.includes(photo) ? [...prev, photo] : prev));
                         }}
                         className="text-[10px] px-2 py-0.5 rounded bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:bg-slate-100"
                       >
