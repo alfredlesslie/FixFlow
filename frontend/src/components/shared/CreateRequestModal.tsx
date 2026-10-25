@@ -227,12 +227,14 @@ export function CreateRequestModal({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!title.trim() || !description.trim()) return;
+    if (!title.trim() || !description.trim() || isUploading) return;
 
     setIsSubmitting(true);
     setSubmitError(null);
     try {
-      const submissionImages = attachedPhotos.map((p) => p.serverUrl || p.previewUrl);
+      const submissionImages = attachedPhotos
+        .map((p) => p.serverUrl || p.previewUrl)
+        .filter(Boolean);
       await createRequest({
         title: title.trim(),
         description: description.trim(),
@@ -520,9 +522,9 @@ export function CreateRequestModal({
           <Button
             type="submit"
             isLoading={isSubmitting}
-            disabled={!title.trim() || !description.trim()}
+            disabled={!title.trim() || !description.trim() || isUploading}
           >
-            Submit Report
+            {isUploading ? 'Uploading Photos...' : 'Submit Report'}
           </Button>
         </div>
       </form>

@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useCallback } from 'react';
+import { useMemo, useCallback, useState, useEffect } from 'react';
 import { useQuery, useMutation, useApolloClient } from '@apollo/client';
 import { useAuth } from './auth-context';
 import {
@@ -43,9 +43,51 @@ import {
   SUGGEST_DUPLICATES_QUERY,
 } from './graphql-operations';
 
+const ATTACHMENTS_STORAGE_KEY = 'fixflow_request_attachments';
+
+function getStoredRequestAttachments(): Record<string, string[]> {
+  if (typeof window === 'undefined') return {};
+  try {
+    const raw = localStorage.getItem(ATTACHMENTS_STORAGE_KEY);
+    return raw ? JSON.parse(raw) : {};
+  } catch {
+    return {};
+  }
+}
+
+function persistRequestAttachments(map: Record<string, string[]>) {
+  if (typeof window === 'undefined') return;
+  try {
+    localStorage.setItem(ATTACHMENTS_STORAGE_KEY, JSON.stringify(map));
+  } catch {}
+}
+
 // Map raw GraphQL request to frontend MaintenanceRequest model
-function mapRequest(r: any, currentUserId: string): MaintenanceRequest {
+function mapRequest(
+  r: any,
+  currentUserId: string,
+  attachmentsMap?: Record<string, string[]>,
+): MaintenanceRequest {
   const upvoted = Boolean(r.hasUpvoted);
+
+  // Authoritatively resolve attachments for this specific request
+  const customImages = attachmentsMap
+    ? attachmentsMap[r.id] || (r.requestNumber ? attachmentsMap[r.requestNumber] : undefined)
+    : undefined;
+
+  let requestImages: string[] = [];
+  if (customImages && Array.isArray(customImages) && customImages.length > 0) {
+    requestImages = customImages;
+  } else if (r.requestNumber === 'REQ-DEMO-006' || r.requestNumber === 'REQ-2026-0006') {
+    // Only the seeded library water pipe leak demo ticket holds these preset demo images
+    requestImages = [
+      '/demo-assets/water-leak-evidence.png',
+      '/demo-assets/hvac-compressor-fault.png',
+    ];
+  } else {
+    requestImages = [];
+  }
+
   return {
     id: r.id,
     requestNumber: r.requestNumber,
@@ -84,10 +126,7 @@ function mapRequest(r: any, currentUserId: string): MaintenanceRequest {
     },
     upvotes: r.upvotesCount || 0,
     upvoters: upvoted && currentUserId ? [currentUserId] : [],
-    images: [
-      '/demo-assets/water-leak-evidence.png',
-      '/demo-assets/hvac-compressor-fault.png',
-    ],
+    images: requestImages,
     comments: [],
     workOrderId: undefined,
     isDuplicate: Boolean(r.isDuplicate),
@@ -230,6 +269,13 @@ export function useDataBridge() {
   const { user: authUser } = useAuth();
   const apolloClient = useApolloClient();
 
+  // Client-side persistent cache for request attachments
+  const [requestAttachments, setRequestAttachments] = useState<Record<string, string[]>>({});
+
+  useEffect(() => {
+    setRequestAttachments(getStoredRequestAttachments());
+  }, []);
+
   // Active user derived from authenticated session
   const activeUser: UserProfile = useMemo(() => {
     if (authUser) {
@@ -337,8 +383,8 @@ export function useDataBridge() {
   // Mapped Data Collections
   const requests: MaintenanceRequest[] = useMemo(() => {
     if (!requestsData?.requests) return [];
-    return requestsData.requests.map((r: any) => mapRequest(r, activeUser.id));
-  }, [requestsData, activeUser.id]);
+    return requestsData.requests.map((r: any) => mapRequest(r, activeUser.id, requestAttachments));
+  }, [requestsData, activeUser.id, requestAttachments]);
 
   const workOrders: WorkOrder[] = useMemo(() => {
     if (!workOrdersData?.workOrders) return [];
@@ -401,8 +447,20 @@ export function useDataBridge() {
           },
         },
       });
+
+      const created = res.data?.createRequest;
+      if (created?.id && params.images && params.images.length > 0) {
+        const nextMap = {
+          ...getStoredRequestAttachments(),
+          [created.id]: params.images,
+          ...(created.requestNumber ? { [created.requestNumber]: params.images } : {}),
+        };
+        persistRequestAttachments(nextMap);
+        setRequestAttachments(nextMap);
+      }
+
       await Promise.all([refetchRequests(), refetchAnalytics()]);
-      return res.data?.createRequest;
+      return created ? { ...created, images: params.images || [] } : created;
     },
     [createRequestMutation, refetchRequests, refetchAnalytics],
   );

@@ -77,6 +77,26 @@ export function IssueDetailModal({
     return request?.comments || [];
   }, [commentsData, request?.comments]);
 
+  const displayImages = useMemo(() => {
+    if (request?.images && request.images.length > 0) {
+      return request.images;
+    }
+    if (!request?.id) return [];
+    if (typeof window !== 'undefined') {
+      try {
+        const raw = localStorage.getItem('fixflow_request_attachments');
+        if (raw) {
+          const map = JSON.parse(raw);
+          const stored = map[request.id] || (request.requestNumber ? map[request.requestNumber] : undefined);
+          if (stored && Array.isArray(stored) && stored.length > 0) {
+            return stored;
+          }
+        }
+      } catch {}
+    }
+    return [];
+  }, [request?.id, request?.requestNumber, request?.images]);
+
   if (!request) return null;
 
   const isUpvoted = request.upvoters.includes(activeUser.id);
@@ -321,14 +341,14 @@ export function IssueDetailModal({
         </div>
 
         {/* Evidence Photos */}
-        {request.images && request.images.length > 0 && (
+        {displayImages && displayImages.length > 0 && (
           <div>
             <h3 className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2 flex items-center gap-1.5">
               <ImageIcon className="w-3.5 h-3.5" />
-              Attached Photographic Evidence ({request.images.length})
+              Attached Photographic Evidence ({displayImages.length})
             </h3>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-              {request.images.map((img, i) => (
+              {displayImages.map((img, i) => (
                 <div
                   key={i}
                   onClick={() => setSelectedImage(img)}
