@@ -22,6 +22,7 @@ import {
 import { Modal } from '@/components/ui/Modal';
 import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
+import { AuthenticatedImage } from '@/components/ui/AuthenticatedImage';
 import { MaintenanceRequest, RequestComment, RequestStatus, UserRole } from '@/lib/types';
 import { useDataBridge } from '@/lib/use-data-bridge';
 import { GET_COMMENTS_QUERY } from '@/lib/graphql-operations';
@@ -333,7 +334,7 @@ export function IssueDetailModal({
                   onClick={() => setSelectedImage(img)}
                   className="group relative h-28 rounded-xl overflow-hidden border border-slate-200 dark:border-slate-800 cursor-pointer shadow-sm"
                 >
-                  <img
+                  <AuthenticatedImage
                     src={img}
                     alt={`Evidence ${i + 1}`}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
@@ -444,7 +445,7 @@ export function IssueDetailModal({
           onClose={() => setSelectedImage(null)}
           maxWidth="2xl"
         >
-          <img
+          <AuthenticatedImage
             src={selectedImage}
             alt="Evidence full view"
             className="w-full h-auto rounded-xl max-h-[75vh] object-contain mx-auto"

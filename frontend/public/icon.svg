@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32">
+  <defs>
+    <linearGradient id="ff-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0284c7" />
+      <stop offset="100%" stop-color="#0369a1" />
+    </linearGradient>
+  </defs>
+
+  <!-- FixFlow Rounded Icon Container -->
+  <rect width="32" height="32" rx="7.5" fill="url(#ff-grad)" />
+
+  <!-- Unified Wrench + Checkmark Emblem -->
+  <path
+    d="M 13.5 6.2
+       C 14 8.6, 14.8 9.8, 16 9.8
+       C 17.2 9.8, 18 8.6, 18.5 6.2
+       C 21 7.2, 21.6 10.4, 19.2 13.8
+       L 25.2 7.8
+       L 27 9.8
+       L 15 25.8
+       L 5.8 16.6
+       L 8.2 14.2
+       L 13.5 19.5
+       L 13.5 13.8
+       C 11.2 10.4, 11.8 7.2, 13.5 6.2
+       Z"
+    fill="#ffffff"
+  />
+</svg>

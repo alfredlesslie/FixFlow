@@ -16,6 +16,7 @@ import {
 } from 'lucide-react';
 import { Modal } from '@/components/ui/Modal';
 import { Button } from '@/components/ui/Button';
+import { AuthenticatedImage } from '@/components/ui/AuthenticatedImage';
 import { useDataBridge } from '@/lib/use-data-bridge';
 import { DuplicateCandidate, CampusLocation } from '@/lib/types';
 
@@ -24,6 +25,13 @@ interface CreateRequestModalProps {
   onClose: () => void;
   onSuccess?: () => void;
   onSelectExistingIssue?: (requestId: string) => void;
+}
+
+interface AttachedPhotoItem {
+  id: string;
+  previewUrl: string;
+  serverUrl?: string;
+  isBlob: boolean;
 }
 
 const CATEGORIES = [
@@ -66,7 +74,7 @@ export function CreateRequestModal({
   const [category, setCategory] = useState(CATEGORIES[0]);
   const [locationId, setLocationId] = useState(availableLocations[0]?.id || LOCATIONS[0].id);
   const [initialSeverity, setInitialSeverity] = useState(5);
-  const [images, setImages] = useState<string[]>([]);
+  const [attachedPhotos, setAttachedPhotos] = useState<AttachedPhotoItem[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
@@ -79,6 +87,30 @@ export function CreateRequestModal({
       setLocationId(availableLocations[0].id);
     }
   }, [availableLocations, locationId]);
+
+  // Keep a ref to attachedPhotos for reliable Blob URL cleanup on unmount
+  const attachedPhotosRef = React.useRef<AttachedPhotoItem[]>(attachedPhotos);
+  attachedPhotosRef.current = attachedPhotos;
+
+  const cleanupAllBlobUrls = () => {
+    attachedPhotosRef.current.forEach((item) => {
+      if (item.isBlob && item.previewUrl.startsWith('blob:')) {
+        URL.revokeObjectURL(item.previewUrl);
+      }
+    });
+  };
+
+  useEffect(() => {
+    return () => {
+      cleanupAllBlobUrls();
+    };
+  }, []);
+
+  const handleClose = () => {
+    cleanupAllBlobUrls();
+    setAttachedPhotos([]);
+    onClose();
+  };
 
   // Live duplicate detection candidates
   const [duplicateCandidates, setDuplicateCandidates] = useState<DuplicateCandidate[]>([]);
@@ -99,7 +131,7 @@ export function CreateRequestModal({
   const handleUpvoteDuplicateInstead = async (candidate: DuplicateCandidate) => {
     try {
       await upvoteRequest(candidate.requestId);
-      onClose();
+      handleClose();
       if (onSelectExistingIssue) {
         onSelectExistingIssue(candidate.requestId);
       }
@@ -109,18 +141,41 @@ export function CreateRequestModal({
   };
 
   const handleAddSamplePhoto = (url: string) => {
-    setImages((prev) => (!prev.includes(url) ? [...prev, url] : prev));
+    if (attachedPhotos.length >= 4) {
+      setUploadError('Maximum of 4 photographic evidence attachments allowed.');
+      return;
+    }
+    setAttachedPhotos((prev) => {
+      if (prev.some((p) => p.previewUrl === url || p.serverUrl === url)) {
+        return prev;
+      }
+      return [
+        ...prev,
+        {
+          id: `sample-${url}`,
+          previewUrl: url,
+          serverUrl: url,
+          isBlob: false,
+        },
+      ];
+    });
   };
 
-  const handleRemovePhoto = (url: string) => {
-    setImages(images.filter((img) => img !== url));
+  const handleRemovePhoto = (id: string) => {
+    setAttachedPhotos((prev) => {
+      const item = prev.find((p) => p.id === id || p.previewUrl === id);
+      if (item?.isBlob && item.previewUrl.startsWith('blob:')) {
+        URL.revokeObjectURL(item.previewUrl);
+      }
+      return prev.filter((p) => p.id !== id && p.previewUrl !== id);
+    });
   };
 
   const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (!files || files.length === 0) return;
 
-    if (images.length >= 4) {
+    if (attachedPhotos.length >= 4) {
       setUploadError('Maximum of 4 photographic evidence attachments allowed.');
       return;
     }
@@ -138,12 +193,31 @@ export function CreateRequestModal({
       return;
     }
 
+    // Immediately generate a local Blob Object URL for instant preview
+    const localPreviewUrl = URL.createObjectURL(file);
+    const tempId = `upload-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+
+    setAttachedPhotos((prev) => [
+      ...prev,
+      {
+        id: tempId,
+        previewUrl: localPreviewUrl,
+        isBlob: true,
+      },
+    ]);
+
     setIsUploading(true);
     try {
       const res = await uploadAttachment(file);
-      const url = res.fileUrl || `/api/attachments/${res.id}`;
-      setImages((prev) => [...prev, url]);
+      const serverUrl = res.fileUrl || `/api/attachments/${res.id}`;
+      // Associate uploaded attachment URL while keeping the local preview URL intact
+      setAttachedPhotos((prev) =>
+        prev.map((item) => (item.id === tempId ? { ...item, serverUrl } : item)),
+      );
     } catch (err: any) {
+      // Clean up the Blob URL and remove from preview list on upload failure
+      URL.revokeObjectURL(localPreviewUrl);
+      setAttachedPhotos((prev) => prev.filter((item) => item.id !== tempId));
       setUploadError(err?.message || 'Server rejected file upload.');
     } finally {
       setIsUploading(false);
@@ -158,20 +232,22 @@ export function CreateRequestModal({
     setIsSubmitting(true);
     setSubmitError(null);
     try {
+      const submissionImages = attachedPhotos.map((p) => p.serverUrl || p.previewUrl);
       await createRequest({
         title: title.trim(),
         description: description.trim(),
         category,
         locationId: selectedLoc.id,
         initialSeverity,
-        images,
+        images: submissionImages,
         user: activeUser,
       });
 
-      // Reset form
+      // Clean up Blob URLs and reset form
+      cleanupAllBlobUrls();
       setTitle('');
       setDescription('');
-      setImages([]);
+      setAttachedPhotos([]);
       setIsSubmitting(false);
       onClose();
       if (onSuccess) onSuccess();
@@ -192,7 +268,7 @@ export function CreateRequestModal({
   return (
     <Modal
       isOpen={isOpen}
-      onClose={onClose}
+      onClose={handleClose}
       maxWidth="2xl"
       title="Report Campus Issue"
       subtitle="Submit maintenance notices for campus facilities, equipment, or safety concerns."
@@ -377,14 +453,14 @@ export function CreateRequestModal({
           )}
 
           {/* Attached image preview chips */}
-          {images.length > 0 && (
+          {attachedPhotos.length > 0 && (
             <div className="grid grid-cols-3 gap-2 mb-3">
-              {images.map((img, i) => (
-                <div key={i} className="relative h-20 rounded-lg overflow-hidden border border-slate-200 dark:border-slate-800 bg-slate-100 dark:bg-slate-900 group">
-                  <img src={img} alt="Attached Evidence" className="w-full h-full object-cover" />
+              {attachedPhotos.map((photo) => (
+                <div key={photo.id} className="relative h-20 rounded-lg overflow-hidden border border-slate-200 dark:border-slate-800 bg-slate-100 dark:bg-slate-900 group">
+                  <AuthenticatedImage src={photo.previewUrl} alt="Attached Evidence" className="w-full h-full object-cover" />
                   <button
                     type="button"
-                    onClick={() => handleRemovePhoto(img)}
+                    onClick={() => handleRemovePhoto(photo.id)}
                     className="absolute top-1 right-1 p-1 rounded-full bg-black/60 text-white hover:bg-rose-600 transition-colors"
                   >
                     <X className="w-3 h-3" />
@@ -405,7 +481,7 @@ export function CreateRequestModal({
             />
             <button
               type="button"
-              disabled={isUploading || images.length >= 4}
+              disabled={isUploading || attachedPhotos.length >= 4}
               onClick={() => fileInputRef.current?.click()}
               className="text-xs font-medium px-3 py-1.5 rounded-lg bg-sky-50 dark:bg-sky-950/50 hover:bg-sky-100 dark:hover:bg-sky-900/50 text-sky-700 dark:text-sky-300 border border-sky-200 dark:border-sky-800 flex items-center gap-1.5 disabled:opacity-50 transition-colors"
             >
@@ -438,7 +514,7 @@ export function CreateRequestModal({
 
         {/* Submit Actions */}
         <div className="flex items-center justify-end gap-3 pt-4 border-t border-slate-100 dark:border-slate-800">
-          <Button type="button" variant="outline" onClick={onClose}>
+          <Button type="button" variant="outline" onClick={handleClose}>
             Cancel
           </Button>
           <Button
