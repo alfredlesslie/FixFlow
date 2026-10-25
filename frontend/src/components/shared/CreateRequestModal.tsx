@@ -54,9 +54,9 @@ const LOCATIONS: CampusLocation[] = [
 ];
 
 const PRESET_SAMPLE_PHOTOS = [
-  '/demo-assets/water-leak-evidence.png',
-  '/demo-assets/hvac-compressor-fault.png',
-  'https://images.unsplash.com/photo-1584622650111-993a426fbf0a?w=800',
+  { label: 'Sample Leak', url: '/demo-assets/water-leak-evidence.png' },
+  { label: 'Sample HVAC', url: '/demo-assets/hvac-compressor-fault.png' },
+  { label: 'Sample Photo', url: 'https://images.unsplash.com/photo-1584622650111-993a426fbf0a?w=800' },
 ];
 
 export function CreateRequestModal({
@@ -460,6 +460,9 @@ export function CreateRequestModal({
               {attachedPhotos.map((photo) => (
                 <div key={photo.id} className="relative h-20 rounded-lg overflow-hidden border border-slate-200 dark:border-slate-800 bg-slate-100 dark:bg-slate-900 group">
                   <AuthenticatedImage src={photo.previewUrl} alt="Attached Evidence" className="w-full h-full object-cover" />
+                  <span className="absolute bottom-1 left-1 px-1.5 py-0.5 rounded text-[9px] font-semibold bg-black/60 text-white">
+                    {photo.isBlob ? 'Real Upload' : 'Sample'}
+                  </span>
                   <button
                     type="button"
                     onClick={() => handleRemovePhoto(photo.id)}
@@ -500,15 +503,15 @@ export function CreateRequestModal({
               )}
             </button>
 
-            <span className="text-[11px] text-slate-400">or sample:</span>
-            {PRESET_SAMPLE_PHOTOS.map((photo, i) => (
+            <span className="text-[11px] text-slate-400">or add sample:</span>
+            {PRESET_SAMPLE_PHOTOS.map((sample, i) => (
               <button
                 key={i}
                 type="button"
-                onClick={() => handleAddSamplePhoto(photo)}
+                onClick={() => handleAddSamplePhoto(sample.url)}
                 className="text-[11px] px-2 py-1 rounded bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700"
               >
-                + Photo {i + 1}
+                + {sample.label}
               </button>
             ))}
           </div>

@@ -78,7 +78,7 @@ function mapRequest(
   let requestImages: string[] = [];
   if (customImages && Array.isArray(customImages) && customImages.length > 0) {
     requestImages = customImages;
-  } else if (r.requestNumber === 'REQ-DEMO-006' || r.requestNumber === 'REQ-2026-0006') {
+  } else if (r.requestNumber === 'REQ-DEMO-006') {
     // Only the seeded library water pipe leak demo ticket holds these preset demo images
     requestImages = [
       '/demo-assets/water-leak-evidence.png',
@@ -449,11 +449,12 @@ export function useDataBridge() {
       });
 
       const created = res.data?.createRequest;
-      if (created?.id && params.images && params.images.length > 0) {
+      if (created?.id) {
+        const submissionImgs = params.images || [];
         const nextMap = {
           ...getStoredRequestAttachments(),
-          [created.id]: params.images,
-          ...(created.requestNumber ? { [created.requestNumber]: params.images } : {}),
+          [created.id]: submissionImgs,
+          ...(created.requestNumber ? { [created.requestNumber]: submissionImgs } : {}),
         };
         persistRequestAttachments(nextMap);
         setRequestAttachments(nextMap);

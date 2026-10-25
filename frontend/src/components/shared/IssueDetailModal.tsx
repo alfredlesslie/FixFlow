@@ -78,22 +78,25 @@ export function IssueDetailModal({
   }, [commentsData, request?.comments]);
 
   const displayImages = useMemo(() => {
-    if (request?.images && request.images.length > 0) {
-      return request.images;
-    }
-    if (!request?.id) return [];
-    if (typeof window !== 'undefined') {
+    // 1. Check persistent custom attachments map first
+    if (request?.id && typeof window !== 'undefined') {
       try {
         const raw = localStorage.getItem('fixflow_request_attachments');
         if (raw) {
           const map = JSON.parse(raw);
           const stored = map[request.id] || (request.requestNumber ? map[request.requestNumber] : undefined);
-          if (stored && Array.isArray(stored) && stored.length > 0) {
+          if (stored && Array.isArray(stored)) {
             return stored;
           }
         }
       } catch {}
     }
+
+    // 2. Fall back to request.images if present and valid
+    if (request?.images && Array.isArray(request.images)) {
+      return request.images;
+    }
+
     return [];
   }, [request?.id, request?.requestNumber, request?.images]);
 

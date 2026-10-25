@@ -10,12 +10,8 @@ import {
   Lock,
   Mail,
   ArrowRight,
-  UserCheck,
   AlertCircle,
   Loader2,
-  Wrench,
-  Shield,
-  HardHat,
   Sparkles,
   UserPlus,
   Layers,
@@ -25,9 +21,8 @@ export default function LoginPage() {
   const router = useRouter();
   const { login, isAuthenticated, user, loading: authLoading } = useAuth();
 
-  const isDevOrTest = process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'test';
-  const [email, setEmail] = useState(isDevOrTest ? 'manager@fixflow.edu' : '');
-  const [password, setPassword] = useState(isDevOrTest ? 'Manager@123' : '');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
@@ -43,51 +38,6 @@ export default function LoginPage() {
       }
     }
   }, [authLoading, isAuthenticated, user, router]);
-
-  const presets = [
-    {
-      role: 'Facility Manager',
-      label: 'Manager',
-      email: 'manager@fixflow.edu',
-      pass: 'Manager@123',
-      icon: <Wrench className="w-3.5 h-3.5 text-indigo-500" />,
-      badge: 'Triage & Dispatch',
-      border: 'hover:border-indigo-400 dark:hover:border-indigo-500',
-    },
-    {
-      role: 'Technician',
-      label: 'Technician',
-      email: 'tech.rahul@fixflow.edu',
-      pass: 'Tech@123',
-      icon: <HardHat className="w-3.5 h-3.5 text-amber-500" />,
-      badge: 'Workbench & Evidence',
-      border: 'hover:border-amber-400 dark:hover:border-amber-500',
-    },
-    {
-      role: 'Requester',
-      label: 'Requester',
-      email: 'student.riya@fixflow.edu',
-      pass: 'Student@123',
-      icon: <UserCheck className="w-3.5 h-3.5 text-sky-500" />,
-      badge: 'Report & Upvote',
-      border: 'hover:border-sky-400 dark:hover:border-sky-500',
-    },
-    {
-      role: 'Administrator',
-      label: 'Admin',
-      email: 'admin@fixflow.edu',
-      pass: 'Admin@123',
-      icon: <Shield className="w-3.5 h-3.5 text-emerald-500" />,
-      badge: 'Governance & Audits',
-      border: 'hover:border-emerald-400 dark:hover:border-emerald-500',
-    },
-  ];
-
-  const handleSelectPreset = (p: typeof presets[0]) => {
-    setEmail(p.email);
-    setPassword(p.pass);
-    setErrorMsg(null);
-  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -239,42 +189,6 @@ export default function LoginPage() {
             </Link>
           </div>
 
-          {/* Quick-Fill Presets for Demonstration (Restricted to development/test only) */}
-          {isDevOrTest && (
-            <div className="pt-4 border-t border-slate-200 dark:border-slate-800 space-y-3">
-              <div className="flex items-center justify-between">
-                <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
-                  Institutional Accounts
-                </span>
-                <span className="text-[10px] text-slate-400 dark:text-slate-500">Tap to populate</span>
-              </div>
-
-              <div className="grid grid-cols-2 gap-2">
-                {presets.map((p) => {
-                  const isSelected = email === p.email;
-                  return (
-                    <button
-                      key={p.role}
-                      type="button"
-                      onClick={() => handleSelectPreset(p)}
-                      className={`text-left p-2.5 rounded-xl border transition-all haptic-press ${
-                        isSelected
-                          ? 'bg-sky-50 dark:bg-slate-800 border-sky-500 text-slate-900 dark:text-white shadow-sm'
-                          : 'bg-slate-50/70 dark:bg-slate-950/70 border-slate-200 dark:border-slate-800/80 text-slate-700 dark:text-slate-300 ' + p.border
-                      }`}
-                    >
-                      <div className="flex items-center gap-1.5 font-bold text-xs text-slate-900 dark:text-white">
-                        {p.icon}
-                        <span>{p.label}</span>
-                      </div>
-                      <div className="text-[10px] text-slate-500 dark:text-slate-400 truncate mt-0.5">{p.email}</div>
-                      <div className="text-[9px] text-slate-400 dark:text-slate-500 mt-1">{p.badge}</div>
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-          )}
         </div>
 
         <div className="text-center">
